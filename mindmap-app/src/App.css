@@ -1,0 +1,176 @@
+.App {
+  text-align: center;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* 툴바 스타일 */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  background: white;
+  border-bottom: 1px solid #e0e0e0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  height: 60px;
+  box-sizing: border-box;
+}
+
+.toolbar-button {
+  padding: 8px 16px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.toolbar-button:hover:not(:disabled) {
+  background: #f5f5f5;
+  border-color: #999;
+  transform: translateY(-1px);
+}
+
+.toolbar-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.toolbar-button.game-button {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  font-weight: 600;
+}
+
+.toolbar-button.game-button:hover:not(:disabled) {
+  background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.toolbar-button.game-button:disabled {
+  background: #ccc;
+  color: #666;
+}
+
+.file-input-label {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.file-input-label input[type="file"] {
+  position: absolute;
+  left: -9999px;
+}
+
+.toolbar-divider {
+  width: 1px;
+  height: 30px;
+  background: #ddd;
+  margin: 0 10px;
+}
+
+.toolbar-info {
+  margin-left: auto;
+  font-size: 12px;
+  color: #666;
+  background: #f8f9fa;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
+}
+
+/* ReactFlow 스타일 커스터마이징 */
+.react-flow__node {
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.react-flow__node:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.react-flow__node.selected {
+  box-shadow: 0 0 0 2px #ff6b6b;
+}
+
+.react-flow__edge {
+  stroke-width: 2;
+}
+
+.react-flow__edge.selected {
+  stroke: #ff6b6b;
+}
+
+/* 컨트롤 패널 스타일 */
+.react-flow__controls {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.react-flow__controls-button {
+  border: none;
+  background: white;
+  border-radius: 4px;
+  margin: 2px;
+  transition: all 0.2s ease;
+}
+
+.react-flow__controls-button:hover {
+  background: #f0f0f0;
+  transform: scale(1.1);
+}
+
+/* 미니맵 스타일 */
+.react-flow__minimap {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 배경 스타일 */
+.react-flow__background {
+  background-color: #f8f9fa;
+}
+
+/* 노드 텍스트 스타일 */
+.react-flow__node-input,
+.react-flow__node-default {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .react-flow__node {
+    font-size: 10px;
+    padding: 8px;
+  }
+  
+  .react-flow__controls {
+    bottom: 20px;
+    left: 20px;
+  }
+  
+  .react-flow__minimap {
+    bottom: 20px;
+    right: 20px;
+    width: 120px;
+    height: 80px;
+  }
+}
