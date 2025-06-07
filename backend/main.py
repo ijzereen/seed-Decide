@@ -15,6 +15,8 @@ allowed_origins = [
     "http://localhost:3003",  # React 개발 서버
     "https://*.vercel.app",   # Vercel 배포 도메인
     "https://*.vercel.com",   # Vercel 커스텀 도메인
+    "https://*.railway.app",  # Railway 배포 도메인
+    "https://*.up.railway.app",  # Railway 새 도메인 형식
 ]
 
 # 환경변수에서 추가 허용 도메인 가져오기
@@ -342,4 +344,5 @@ async def analyze_story_structure(request: Dict[str, Any]):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    port = int(os.getenv("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
