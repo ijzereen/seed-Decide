@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useRef, useEffect, useMemo } from 'react';
+import React, { useCallback, useState, useRef, useEffect } from 'react';
 import ReactFlow, {
   MiniMap,
   Controls,
@@ -112,7 +112,7 @@ function MindMapFlow() {
   useEffect(() => {
     console.log('노드 상태:', nodes);
     console.log('엣지 상태:', edges);
-  }, [nodes.length, edges.length]);
+  }, [nodes, edges]);
 
   // 빈 공간 더블클릭으로 노드 추가
   const onPaneClick = useCallback(
@@ -306,7 +306,7 @@ function MindMapFlow() {
         })
       );
     }
-  }, [nodes.length, edges.length]);
+  }, [nodes, edges, setNodes]);
 
   // 샘플 스토리 로드
   const loadSampleStory = useCallback(() => {

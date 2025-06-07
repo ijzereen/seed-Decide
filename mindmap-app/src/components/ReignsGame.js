@@ -102,7 +102,7 @@ const ReignsGame = ({ nodes, edges, onBackToEditor, gameConfig }) => {
   };
 
   // 선택지 선택 처리
-  const handleChoice = (choiceNode) => {
+  const handleChoice = useCallback((choiceNode) => {
     // 스탯 변화 적용 (노드에 설정된 값 또는 랜덤)
     const statChanges = choiceNode.data.statChanges || generateStatChanges();
     setGameStats(prev => ({
@@ -114,7 +114,7 @@ const ReignsGame = ({ nodes, edges, onBackToEditor, gameConfig }) => {
 
     // 다음 노드로 이동
     setCurrentNodeId(choiceNode.id);
-  };
+  }, []);
 
   // 스탯 변화 생성 (랜덤)
   const generateStatChanges = () => {
@@ -149,10 +149,10 @@ const ReignsGame = ({ nodes, edges, onBackToEditor, gameConfig }) => {
   };
 
   // 게임 오버 체크
-  const isGameOver = () => {
+  const isGameOver = useCallback(() => {
     return Object.values(gameStats).some(stat => stat <= 0) || 
            Object.values(gameStats).some(stat => stat >= 100);
-  };
+  }, [gameStats]);
 
   // 키보드 이벤트 처리
   useEffect(() => {
