@@ -32,8 +32,10 @@ REACT_APP_API_URL=https://your-railway-app.railway.app
 3. "Environment Variables" 섹션
 4. 변수 추가:
    - **Name**: `REACT_APP_API_URL`
-   - **Value**: Railway에서 생성된 백엔드 도메인
+   - **Value**: `https://your-railway-app.railway.app` (실제 Railway 도메인으로 교체)
    - **Environment**: Production, Preview, Development 모두 선택
+
+**중요**: vercel.json에서 환경변수를 설정하지 말고 반드시 Vercel 대시보드에서 설정하세요.
 
 ## 4. 도메인 설정
 
