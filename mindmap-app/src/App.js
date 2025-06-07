@@ -310,7 +310,7 @@ function MindMapFlow() {
         setNodes(updatedNodes);
       }
     }
-  }, [nodes.length, edges.length, setNodes]);
+  }, [nodes.length, edges.length, setNodes, edges, nodes]);
 
   // 샘플 스토리 로드
   const loadSampleStory = useCallback(() => {
