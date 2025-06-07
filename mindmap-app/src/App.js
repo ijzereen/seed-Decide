@@ -277,36 +277,40 @@ function MindMapFlow() {
         !edges.some(edge => edge.target === node.id)
       );
       
-      setNodes((nds) =>
-        nds.map((node) => {
-          const isStartingNode = startingNodes.some(startNode => startNode.id === node.id);
-          const currentBorder = node.style?.border || '';
-          const shouldHaveGoldBorder = isStartingNode;
-          const hasGoldBorder = currentBorder.includes('#ffd700');
-          
-          // 이미 올바른 상태라면 변경하지 않음
-          if (shouldHaveGoldBorder === hasGoldBorder) {
-            return node;
+      let needsUpdate = false;
+      const updatedNodes = nodes.map((node) => {
+        const isStartingNode = startingNodes.some(startNode => startNode.id === node.id);
+        const currentBorder = node.style?.border || '';
+        const shouldHaveGoldBorder = isStartingNode;
+        const hasGoldBorder = currentBorder.includes('#ffd700');
+        
+        // 이미 올바른 상태라면 변경하지 않음
+        if (shouldHaveGoldBorder === hasGoldBorder) {
+          return node;
+        }
+        
+        needsUpdate = true;
+        return {
+          ...node,
+          style: {
+            ...node.style,
+            border: isStartingNode ? '3px solid #ffd700' : '2px solid rgba(255, 255, 255, 0.2)',
+            boxShadow: isStartingNode ? 
+              (node.style?.boxShadow?.includes('rgba(255, 215, 0') ? node.style.boxShadow : '0 8px 32px rgba(0, 0, 0, 0.2), 0 0 20px rgba(255, 215, 0, 0.5)') : 
+              '0 8px 32px rgba(0, 0, 0, 0.2)',
+          },
+          data: {
+            ...node.data,
+            isStartingNode
           }
-          
-          return {
-            ...node,
-            style: {
-              ...node.style,
-              border: isStartingNode ? '3px solid #ffd700' : '2px solid rgba(255, 255, 255, 0.2)',
-              boxShadow: isStartingNode ? 
-                (node.style?.boxShadow?.includes('rgba(255, 215, 0') ? node.style.boxShadow : '0 8px 32px rgba(0, 0, 0, 0.2), 0 0 20px rgba(255, 215, 0, 0.5)') : 
-                '0 8px 32px rgba(0, 0, 0, 0.2)',
-            },
-            data: {
-              ...node.data,
-              isStartingNode
-            }
-          };
-        })
-      );
+        };
+      });
+      
+      if (needsUpdate) {
+        setNodes(updatedNodes);
+      }
     }
-  }, [nodes, edges, setNodes]);
+  }, [nodes.length, edges.length, setNodes]);
 
   // 샘플 스토리 로드
   const loadSampleStory = useCallback(() => {
