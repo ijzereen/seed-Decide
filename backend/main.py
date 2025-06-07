@@ -10,24 +10,17 @@ from datetime import datetime
 app = FastAPI(title="Story Generator API", version="1.0.0")
 
 # CORS 설정
-allowed_origins = [
-    "http://localhost:3000", 
-    "http://localhost:3003",  # React 개발 서버
-    "https://*.vercel.app",   # Vercel 배포 도메인
-    "https://*.vercel.com",   # Vercel 커스텀 도메인
-    "https://*.railway.app",  # Railway 배포 도메인
-    "https://*.up.railway.app",  # Railway 새 도메인 형식
-]
-
-# 환경변수에서 추가 허용 도메인 가져오기
-additional_origins = os.getenv("ALLOWED_ORIGINS", "").split(",")
-for origin in additional_origins:
-    if origin.strip():
-        allowed_origins.append(origin.strip())
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allowed_origins,
+    allow_origins=[
+        "http://localhost:3000", 
+        "http://localhost:3003",  # React 개발 서버
+        "https://*.amplifyapp.com",  # Amplify 기본 도메인
+        "https://*.amazonaws.com",   # AWS 서비스 도메인
+        "https://*.elasticbeanstalk.com",  # Elastic Beanstalk 도메인
+        "http://*.elasticbeanstalk.com",   # Elastic Beanstalk HTTP
+        "*"  # 개발 중에는 모든 origin 허용 (운영에서는 제거)
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -344,5 +337,4 @@ async def analyze_story_structure(request: Dict[str, Any]):
 
 if __name__ == "__main__":
     import uvicorn
-    port = int(os.getenv("PORT", 8000))
-    uvicorn.run(app, host="0.0.0.0", port=port)
+    uvicorn.run(app, host="0.0.0.0", port=8000)
