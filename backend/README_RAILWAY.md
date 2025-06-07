@@ -29,7 +29,7 @@ Railway는 다음 파일들을 자동으로 감지합니다:
 - `requirements.txt` - Python 의존성
 - `Procfile` - 서버 실행 명령
 - `railway.toml` - Railway 설정
-- `nixpacks.toml` - 빌드 설정
+- `runtime.txt` - Python 버전 지정
 
 ## 4. 도메인 설정
 
