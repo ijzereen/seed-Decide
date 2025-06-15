@@ -277,7 +277,7 @@ function MindMapFlow() {
     reader.readAsText(file);
     // 파일 입력 초기화
     event.target.value = '';
-  }, [setNodes, setEdges]);
+  }, [setNodes, setEdges, t]);
 
 
   // 노드나 엣지가 변경될 때마다 시작 노드 스타일 업데이트
