@@ -133,7 +133,7 @@ const NodeEditor = ({ node, nodes, edges, gameConfig, onSave, onClose, onGenerat
     const file = event.target.files[0];
     if (!file) return;
 
-    console.log('이미지 업로드 시작:', file.name, file.type, file.size);
+    console.log('Image upload started:', file.name, file.type, file.size);
 
     if (!file.type.startsWith('image/')) {
       alert(t('imageFilesOnly'));
@@ -155,24 +155,24 @@ const NodeEditor = ({ node, nodes, edges, gameConfig, onSave, onClose, onGenerat
       const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000';
       const uploadUrl = `${backendUrl}/api/upload-image`;
       
-      console.log('업로드 URL:', uploadUrl);
-      console.log('업로드 요청 시작');
+      console.log('Upload URL:', uploadUrl);
+      console.log('Upload request started');
       
       const response = await fetch(uploadUrl, {
         method: 'POST',
         body: formData,
       });
       
-      console.log('응답 상태:', response.status, response.statusText);
+      console.log('Response status:', response.status, response.statusText);
       
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('서버 응답 오류:', errorText);
-        throw new Error(`서버 오류 (${response.status}): ${errorText}`);
+        console.error('Server response error:', errorText);
+        throw new Error(`Server error (${response.status}): ${errorText}`);
       }
       
       const result = await response.json();
-      console.log('업로드 성공:', result);
+      console.log('Upload successful:', result);
       
       setNodeData(prev => ({
         ...prev,
@@ -184,7 +184,7 @@ const NodeEditor = ({ node, nodes, edges, gameConfig, onSave, onClose, onGenerat
       alert(t('imageUploadSuccess'));
       
     } catch (error) {
-      console.error('이미지 업로드 실패:', error);
+      console.error('Image upload failed:', error);
       
       if (error.message.includes('fetch')) {
         alert(t('serverConnectionError'));
@@ -215,7 +215,7 @@ const NodeEditor = ({ node, nodes, edges, gameConfig, onSave, onClose, onGenerat
       setImagePreview(null);
       
     } catch (error) {
-      console.error('이미지 삭제 실패:', error);
+      console.error('Image deletion failed:', error);
       setNodeData(prev => ({
         ...prev,
         imageUrl: ''

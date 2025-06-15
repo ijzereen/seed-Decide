@@ -1,14 +1,50 @@
-/* 고급스럽고 장인적인 카드 게임 스타일 */
+/* 웅장하고 장대한 스토리 게임 스타일 */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:wght@400;500;600;700&family=Noto+Serif+KR:wght@400;500;600;700&family=Noto+Serif+JP:wght@400;500;600;700&display=swap');
+
 .reigns-game-mobile {
   width: 100vw;
   height: 100vh;
-  background: radial-gradient(ellipse at top, #0f1419 0%, #1a2332 30%, #2d3748 100%);
+  min-height: 100vh;
+  background: 
+    radial-gradient(ellipse at 20% 10%, rgba(30, 60, 114, 0.8) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(42, 82, 152, 0.6) 0%, transparent 50%),
+    radial-gradient(ellipse at 40% 80%, rgba(26, 26, 46, 0.9) 0%, transparent 50%),
+    linear-gradient(135deg, #0c0c1e 0%, #1a1a2e 25%, #2d1b69 50%, #1e3c72 75%, #0f0f23 100%);
   display: flex;
   flex-direction: column;
-  font-family: 'Playfair Display', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, serif;
+  font-family: 'Cinzel', 'Cormorant Garamond', 'Noto Serif KR', 'Noto Serif JP', serif;
   color: #2c3e50;
   overflow: hidden;
-  position: relative;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  animation: nightSkyShift 30s ease-in-out infinite alternate;
+}
+
+@keyframes nightSkyShift {
+  0% { 
+    background: 
+      radial-gradient(ellipse at 20% 10%, rgba(30, 60, 114, 0.8) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 20%, rgba(42, 82, 152, 0.6) 0%, transparent 50%),
+      radial-gradient(ellipse at 40% 80%, rgba(26, 26, 46, 0.9) 0%, transparent 50%),
+      linear-gradient(135deg, #0c0c1e 0%, #1a1a2e 25%, #2d1b69 50%, #1e3c72 75%, #0f0f23 100%);
+  }
+  50% {
+    background: 
+      radial-gradient(ellipse at 70% 30%, rgba(30, 60, 114, 0.9) 0%, transparent 50%),
+      radial-gradient(ellipse at 30% 70%, rgba(42, 82, 152, 0.7) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 20%, rgba(26, 26, 46, 0.8) 0%, transparent 50%),
+      linear-gradient(135deg, #0f0f23 0%, #2d1b69 25%, #1e3c72 50%, #1a1a2e 75%, #0c0c1e 100%);
+  }
+  100% { 
+    background: 
+      radial-gradient(ellipse at 80% 80%, rgba(30, 60, 114, 0.7) 0%, transparent 50%),
+      radial-gradient(ellipse at 20% 40%, rgba(42, 82, 152, 0.8) 0%, transparent 50%),
+      radial-gradient(ellipse at 60% 10%, rgba(26, 26, 46, 0.9) 0%, transparent 50%),
+      linear-gradient(135deg, #1a1a2e 0%, #0c0c1e 25%, #1e3c72 50%, #2d1b69 75%, #0f0f23 100%);
+  }
 }
 
 .reigns-game-mobile::before {
@@ -18,11 +54,71 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: 
-    radial-gradient(circle at 20% 20%, rgba(255, 215, 0, 0.03) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(138, 43, 226, 0.03) 0%, transparent 50%),
-    radial-gradient(circle at 40% 60%, rgba(30, 144, 255, 0.02) 0%, transparent 50%);
+  background-image: 
+    radial-gradient(2px 2px at 20px 30px, #ffffff, transparent),
+    radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.8), transparent),
+    radial-gradient(1px 1px at 90px 40px, #ffffff, transparent),
+    radial-gradient(1px 1px at 130px 80px, rgba(255,255,255,0.6), transparent),
+    radial-gradient(2px 2px at 160px 30px, #ffffff, transparent),
+    radial-gradient(1px 1px at 200px 90px, rgba(255,255,255,0.7), transparent),
+    radial-gradient(2px 2px at 240px 50px, #ffffff, transparent),
+    radial-gradient(1px 1px at 280px 120px, rgba(255,255,255,0.5), transparent),
+    radial-gradient(1px 1px at 320px 40px, #ffffff, transparent),
+    radial-gradient(2px 2px at 360px 80px, rgba(255,255,255,0.8), transparent);
+  background-repeat: repeat;
+  background-size: 400px 200px;
   pointer-events: none;
+  animation: starsTwinkle 8s ease-in-out infinite alternate;
+}
+
+@keyframes starsTwinkle {
+  0% { 
+    opacity: 0.3; 
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 0.8; 
+    transform: scale(1.1);
+  }
+  100% { 
+    opacity: 0.4; 
+    transform: scale(1);
+  }
+}
+
+/* 달 추가 */
+.reigns-game-mobile::after {
+  content: '';
+  position: absolute;
+  top: 8%;
+  right: 12%;
+  width: 70px;
+  height: 70px;
+  background: 
+    radial-gradient(circle at 30% 30%, #ffffff 0%, #f8f8ff 40%, #e6e6fa 100%);
+  border-radius: 50%;
+  box-shadow: 
+    0 0 30px rgba(255, 255, 255, 0.4),
+    0 0 60px rgba(255, 255, 255, 0.2),
+    inset -10px -10px 0 rgba(200, 200, 220, 0.3);
+  pointer-events: none;
+  animation: moonGlow 12s ease-in-out infinite alternate;
+  z-index: 1;
+}
+
+@keyframes moonGlow {
+  0% { 
+    box-shadow: 
+      0 0 30px rgba(255, 255, 255, 0.4),
+      0 0 60px rgba(255, 255, 255, 0.2),
+      inset -10px -10px 0 rgba(200, 200, 220, 0.3);
+  }
+  100% { 
+    box-shadow: 
+      0 0 40px rgba(255, 255, 255, 0.6),
+      0 0 80px rgba(255, 255, 255, 0.3),
+      inset -10px -10px 0 rgba(200, 200, 220, 0.4);
+  }
 }
 
 /* 상단 스탯 바 - 고급스러운 보석 스타일 */
@@ -30,13 +126,15 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 50px;
-  padding: 30px 20px;
+  gap: 45px;
+  padding: 25px 20px;
   background: rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   position: relative;
   z-index: 2;
+  flex-shrink: 0;
+  min-height: 100px;
 }
 
 .stat-mobile {
@@ -68,17 +166,18 @@
 
 .stat-mobile span {
   font-size: 16px;
-  font-weight: 600;
-  margin-bottom: 12px;
+  font-weight: 700;
+  margin-bottom: 10px;
   color: #f8f9fa;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
-  font-family: 'SF Pro Display', sans-serif;
-  letter-spacing: 0.5px;
+  text-shadow: 0 3px 6px rgba(0, 0, 0, 0.8);
+  font-family: 'Cinzel', 'Noto Serif KR', 'Noto Serif JP', serif;
+  letter-spacing: 1px;
+  text-transform: uppercase;
 }
 
 .stat-bar-mobile {
   width: 4px;
-  height: 50px;
+  height: 45px;
   background: rgba(255, 255, 255, 0.15);
   border-radius: 3px;
   overflow: hidden;
@@ -93,6 +192,24 @@
   transition: height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   border-radius: 3px;
   box-shadow: 0 0 10px currentColor;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-fill::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+  animation: statShimmer 2s infinite;
+}
+
+@keyframes statShimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
 }
 
 .stat-fill.health {
@@ -115,37 +232,60 @@
   box-shadow: 0 0 12px rgba(155, 89, 182, 0.6);
 }
 
-/* 카드 컨테이너 */
+/* 중앙 카드 컨테이너 */
 .card-container {
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px 50px;
   position: relative;
-  max-height: 60vh;
+  padding: clamp(15px, 3vh, 25px);
+  min-height: 0;
+  overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-/* 메인 스토리 카드 - 프리미엄 카드 느낌 */
+/* 중앙 배치 스토리 카드 - 고정 크기로 일정한 비율 유지 */
 .story-card-mobile {
-  width: 85%;
-  max-width: 340px;
-  height: 460px;
-  background: linear-gradient(145deg, #fff9e6 0%, #f7f0dc 50%, #ebe0c7 100%);
-  border-radius: 24px;
+  width: 480px;
+  height: 640px;
+  max-width: calc(100vw - 40px);
+  max-height: calc(100vh - 180px);
+  background: linear-gradient(145deg, #f4e4bc 0%, #e8d5a3 50%, #d4af37 100%);
+  border-radius: 20px;
   box-shadow: 
-    0 30px 60px rgba(0, 0, 0, 0.5),
-    0 10px 20px rgba(0, 0, 0, 0.3),
-    inset 0 2px 0 rgba(255, 255, 255, 0.4),
-    inset 0 -2px 0 rgba(0, 0, 0, 0.1);
+    0 30px 60px rgba(0, 0, 0, 0.8),
+    0 15px 30px rgba(0, 0, 0, 0.6),
+    inset 0 3px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
   position: relative;
   cursor: grab;
   user-select: none;
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  border: 2px solid #c9a96e;
   overflow: hidden;
+  border: 3px solid #c9a96e;
+}
+
+@keyframes cardFloat {
+  0% { 
+    transform: translateY(0px) rotate(0deg);
+    box-shadow: 
+      0 30px 60px rgba(0, 0, 0, 0.5),
+      0 10px 20px rgba(0, 0, 0, 0.3),
+      inset 0 2px 0 rgba(255, 255, 255, 0.4),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.1);
+  }
+  100% { 
+    transform: translateY(-3px) rotate(0.5deg);
+    box-shadow: 
+      0 35px 70px rgba(0, 0, 0, 0.6),
+      0 15px 30px rgba(0, 0, 0, 0.4),
+      inset 0 2px 0 rgba(255, 255, 255, 0.5),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.15);
+  }
 }
 
 .story-card-mobile::before {
@@ -160,6 +300,40 @@
     radial-gradient(circle at 30% 20%, rgba(255, 215, 0, 0.1) 0%, transparent 50%),
     radial-gradient(circle at 70% 80%, rgba(139, 69, 19, 0.05) 0%, transparent 50%);
   pointer-events: none;
+  animation: cardHologram 6s ease-in-out infinite alternate;
+}
+
+@keyframes cardHologram {
+  0% {
+    background: 
+      linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, transparent 30%, rgba(255, 255, 255, 0.1) 70%, transparent 100%),
+      radial-gradient(circle at 30% 20%, rgba(255, 215, 0, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 70% 80%, rgba(139, 69, 19, 0.05) 0%, transparent 50%);
+  }
+  25% {
+    background: 
+      linear-gradient(45deg, rgba(255, 255, 255, 0.25) 0%, transparent 30%, rgba(255, 215, 0, 0.1) 70%, transparent 100%),
+      radial-gradient(circle at 60% 30%, rgba(138, 43, 226, 0.08) 0%, transparent 50%),
+      radial-gradient(circle at 40% 70%, rgba(30, 144, 255, 0.06) 0%, transparent 50%);
+  }
+  50% {
+    background: 
+      linear-gradient(225deg, rgba(255, 255, 255, 0.15) 0%, transparent 30%, rgba(138, 43, 226, 0.1) 70%, transparent 100%),
+      radial-gradient(circle at 80% 60%, rgba(255, 215, 0, 0.12) 0%, transparent 50%),
+      radial-gradient(circle at 20% 40%, rgba(255, 99, 132, 0.05) 0%, transparent 50%);
+  }
+  75% {
+    background: 
+      linear-gradient(315deg, rgba(255, 255, 255, 0.18) 0%, transparent 30%, rgba(30, 144, 255, 0.08) 70%, transparent 100%),
+      radial-gradient(circle at 40% 80%, rgba(139, 69, 19, 0.08) 0%, transparent 50%),
+      radial-gradient(circle at 60% 20%, rgba(255, 215, 0, 0.09) 0%, transparent 50%);
+  }
+  100% {
+    background: 
+      linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, transparent 30%, rgba(255, 255, 255, 0.1) 70%, transparent 100%),
+      radial-gradient(circle at 30% 20%, rgba(255, 215, 0, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 70% 80%, rgba(139, 69, 19, 0.05) 0%, transparent 50%);
+  }
 }
 
 .story-card-mobile::after {
@@ -187,66 +361,82 @@
 
 .card-content {
   flex: 1;
-  padding: 40px 30px;
+  padding: 40px 50px 130px 50px;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
   text-align: center;
   color: #2c3e50;
   background: transparent;
   position: relative;
   z-index: 2;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 .card-content h3 {
-  font-size: 24px;
-  margin-bottom: 24px;
-  color: #2c3e50;
+  font-size: 32px;
+  margin: 0 0 25px 0;
+  color: #1a202c;
   font-weight: 700;
-  line-height: 1.2;
-  letter-spacing: -0.5px;
-  text-shadow: 0 2px 4px rgba(255, 255, 255, 0.4), 0 1px 2px rgba(0, 0, 0, 0.1);
-  font-family: 'Playfair Display', serif;
+  line-height: 1.3;
+  letter-spacing: 1.5px;
+  text-shadow: 0 4px 8px rgba(255, 255, 255, 0.6), 0 3px 6px rgba(0, 0, 0, 0.3);
+  font-family: 'Cinzel', 'Noto Serif KR', 'Noto Serif JP', serif;
+  text-transform: uppercase;
+  text-align: center;
+  width: 100%;
 }
 
 .card-content p {
-  font-size: 16px;
-  line-height: 1.6;
-  color: #34495e;
-  font-weight: 400;
-  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.3);
-  font-family: 'SF Pro Display', sans-serif;
+  font-size: 20px;
+  line-height: 1.7;
+  color: #2c3e50;
+  font-weight: 500;
+  text-shadow: 0 3px 6px rgba(255, 255, 255, 0.5);
+  font-family: 'Cormorant Garamond', 'Noto Serif KR', 'Noto Serif JP', serif;
+  letter-spacing: 0.8px;
+  margin: 0 0 12px 0;
+  text-align: center;
+  width: 100%;
+  word-wrap: break-word;
+  hyphens: auto;
 }
 
 /* 스토리 텍스트 컨테이너 */
 .story-text {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 8px;
+  width: 100%;
+  align-items: center;
+  text-align: center;
 }
 
 /* 스토리 각 줄 */
 .story-line {
-  font-size: 16px;
-  line-height: 1.6;
-  color: #34495e;
-  font-weight: 400;
-  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.3);
+  font-size: 20px;
+  line-height: 1.7;
+  color: #2c3e50;
+  font-weight: 500;
+  text-shadow: 0 3px 6px rgba(255, 255, 255, 0.5);
   margin: 0;
-  padding: 3px 0;
-  min-height: 1.6em;
-  font-family: 'SF Pro Display', sans-serif;
+  padding: 5px 0;
+  min-height: 1.7em;
+  font-family: 'Cormorant Garamond', 'Noto Serif KR', 'Noto Serif JP', serif;
+  letter-spacing: 0.8px;
+  text-align: center;
+  width: 100%;
+  word-wrap: break-word;
+  hyphens: auto;
 }
 
-/* 스와이프 힌트 - 카드 양옆에 명확하게 표시 */
+/* 스와이프 힌트 - 숨김 처리 */
 .swipe-hints-container {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  pointer-events: none;
-  z-index: 5;
+  display: none;
 }
 
 .choice-hint-side {
@@ -364,38 +554,53 @@
   display: none;
 }
 
-/* 선택지 버튼 - 프리미엄 카드 스타일 */
+/* 선택지 버튼 - 좌우 배치로 직관적인 UI */
 .choice-buttons-mobile {
-  padding: 30px 25px;
+  position: absolute;
+  bottom: 50px;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
-  flex-direction: column;
-  gap: 18px;
-  background: transparent;
-  border-top: none;
+  flex-direction: row;
+  gap: 40px;
+  width: auto;
+  padding: 0;
+  background: none;
+  backdrop-filter: none;
+  border-radius: 0;
+  margin-top: 0;
+  flex-shrink: 0;
+  z-index: 15;
 }
 
 .choice-button-mobile {
-  border: 2px solid rgba(44, 62, 80, 0.8);
-  border-radius: 18px;
-  padding: 18px 24px;
+  border: 3px solid rgba(255, 255, 255, 0.8);
+  border-radius: 50px;
+  padding: 15px 25px;
   color: #ffffff;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   text-align: center;
   box-shadow: 
-    0 10px 25px rgba(0, 0, 0, 0.3),
-    0 4px 10px rgba(0, 0, 0, 0.2),
-    inset 0 2px 0 rgba(255, 255, 255, 0.3),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+    0 8px 25px rgba(0, 0, 0, 0.4),
+    0 4px 12px rgba(0, 0, 0, 0.3),
+    inset 0 2px 0 rgba(255, 255, 255, 0.3);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
   pointer-events: auto;
   z-index: 10;
   position: relative;
-  font-family: 'SF Pro Display', sans-serif;
-  letter-spacing: 0.3px;
+  font-family: 'Cinzel', 'Noto Serif KR', 'Noto Serif JP', serif;
+  letter-spacing: 1px;
   overflow: hidden;
+  min-width: 120px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-transform: uppercase;
+  backdrop-filter: blur(10px);
 }
 
 .choice-button-mobile::before {
@@ -409,53 +614,110 @@
   transition: left 0.6s ease;
 }
 
+.choice-button-mobile::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+  border-radius: 18px;
+  opacity: 0;
+  animation: buttonPulse 3s ease-in-out infinite;
+}
+
+@keyframes buttonPulse {
+  0%, 100% { opacity: 0; transform: scale(1); }
+  50% { opacity: 0.3; transform: scale(1.02); }
+}
+
 .choice-button-mobile:hover::before {
   left: 100%;
 }
 
+.choice-button-mobile:hover::after {
+  animation-duration: 1s;
+}
+
 .choice-button-mobile.left-choice {
-  background: linear-gradient(145deg, #4a90e2 0%, #357abd 30%, #2c5aa0 100%);
-  border-color: rgba(74, 144, 226, 0.8);
+  background: linear-gradient(135deg, #2c3e50 0%, #34495e 50%, #1a252f 100%);
+  border-color: rgba(212, 175, 55, 0.8);
   box-shadow: 
-    0 10px 25px rgba(74, 144, 226, 0.4),
-    0 4px 10px rgba(0, 0, 0, 0.2),
-    inset 0 2px 0 rgba(255, 255, 255, 0.3),
+    0 8px 25px rgba(44, 62, 80, 0.6),
+    0 4px 12px rgba(0, 0, 0, 0.4),
+    inset 0 2px 0 rgba(212, 175, 55, 0.3),
     inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+.choice-button-mobile.left-choice::before {
+  content: '←';
+  position: absolute;
+  left: 8px;
+  font-size: 18px;
+  font-weight: bold;
+  opacity: 0.8;
+  color: #d4af37;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  transition: all 0.3s ease;
 }
 
 .choice-button-mobile.right-choice {
-  background: linear-gradient(145deg, #e74c3c 0%, #c0392b 30%, #a93226 100%);
-  border-color: rgba(231, 76, 60, 0.8);
+  background: linear-gradient(135deg, #8b4513 0%, #a0522d 50%, #654321 100%);
+  border-color: rgba(212, 175, 55, 0.8);
   box-shadow: 
-    0 10px 25px rgba(231, 76, 60, 0.4),
-    0 4px 10px rgba(0, 0, 0, 0.2),
-    inset 0 2px 0 rgba(255, 255, 255, 0.3),
+    0 8px 25px rgba(139, 69, 19, 0.6),
+    0 4px 12px rgba(0, 0, 0, 0.4),
+    inset 0 2px 0 rgba(212, 175, 55, 0.3),
     inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+.choice-button-mobile.right-choice::before {
+  content: '→';
+  position: absolute;
+  right: 8px;
+  font-size: 18px;
+  font-weight: bold;
+  opacity: 0.8;
+  color: #d4af37;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  transition: all 0.3s ease;
 }
 
 .choice-button-mobile:hover {
-  transform: translateY(-5px) scale(1.02);
+  transform: translateY(-3px) scale(1.05);
   box-shadow: 
-    0 15px 35px rgba(0, 0, 0, 0.4),
-    0 8px 15px rgba(0, 0, 0, 0.3),
-    inset 0 2px 0 rgba(255, 255, 255, 0.4),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+    0 12px 30px rgba(0, 0, 0, 0.4),
+    0 6px 15px rgba(0, 0, 0, 0.3),
+    inset 0 2px 0 rgba(255, 255, 255, 0.4);
 }
 
 .choice-button-mobile.left-choice:hover {
   box-shadow: 
-    0 15px 35px rgba(74, 144, 226, 0.6),
-    0 8px 15px rgba(0, 0, 0, 0.3),
-    inset 0 2px 0 rgba(255, 255, 255, 0.4),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+    0 12px 30px rgba(44, 62, 80, 0.7),
+    0 6px 15px rgba(0, 0, 0, 0.4),
+    inset 0 2px 0 rgba(212, 175, 55, 0.4),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+}
+
+.choice-button-mobile.left-choice:hover::before {
+  opacity: 1;
+  transform: translateX(-2px);
 }
 
 .choice-button-mobile.right-choice:hover {
   box-shadow: 
-    0 15px 35px rgba(231, 76, 60, 0.6),
-    0 8px 15px rgba(0, 0, 0, 0.3),
-    inset 0 2px 0 rgba(255, 255, 255, 0.4),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+    0 12px 30px rgba(139, 69, 19, 0.7),
+    0 6px 15px rgba(0, 0, 0, 0.4),
+    inset 0 2px 0 rgba(212, 175, 55, 0.4),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+}
+
+.choice-button-mobile.right-choice:hover::before {
+  opacity: 1;
+  transform: translateX(2px);
 }
 
 .choice-button-mobile:active {
@@ -472,50 +734,50 @@
   text-align: center;
   padding: 10px 20px;
   background: transparent;
+  margin-top: 10px;
 }
 
 .keyboard-hint span {
-  font-size: 12px;
-  color: rgba(248, 249, 250, 0.8);
-  font-weight: 400;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-  letter-spacing: 0.3px;
+  font-size: 14px;
+  color: rgba(248, 249, 250, 0.9);
+  font-weight: 500;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+  letter-spacing: 0.5px;
+  font-family: 'Cormorant Garamond', 'Noto Serif KR', 'Noto Serif JP', serif;
 }
 
-/* 하단 컨트롤 - 고급 스타일 */
+/* 상단 컨트롤 - 고급 스타일 */
 .controls-mobile {
+  position: absolute;
+  top: 20px;
+  right: 20px;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 25px 35px;
-  background: rgba(0, 0, 0, 0.2);
-  backdrop-filter: blur(10px);
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  position: relative;
-  z-index: 2;
+  gap: 12px;
+  z-index: 20;
 }
 
 .control-button {
-  background: linear-gradient(145deg, #95a5a6 0%, #7f8c8d 50%, #6c7b7d 100%);
+  background: linear-gradient(145deg, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.6) 100%);
   color: white;
-  border: 2px solid rgba(44, 62, 80, 0.8);
-  border-radius: 14px;
-  padding: 14px 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50px;
+  padding: 12px 20px;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  letter-spacing: 0.2px;
+  letter-spacing: 0.5px;
   box-shadow: 
-    0 6px 15px rgba(0, 0, 0, 0.3),
-    0 2px 6px rgba(0, 0, 0, 0.2),
-    inset 0 2px 0 rgba(255, 255, 255, 0.3),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+    0 6px 15px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
   pointer-events: auto;
   z-index: 10;
   position: relative;
-  font-family: 'SF Pro Display', sans-serif;
+  font-family: 'Cinzel', 'Noto Serif KR', 'Noto Serif JP', serif;
+  text-transform: uppercase;
+  backdrop-filter: blur(10px);
+  white-space: nowrap;
 }
 
 .control-button:hover {
@@ -554,12 +816,14 @@
 }
 
 .game-over h2 {
-  font-size: 32px;
-  margin-bottom: 30px;
+  font-size: 42px;
+  margin-bottom: 35px;
   color: #f8f9fa;
   font-weight: 700;
-  letter-spacing: -1px;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  letter-spacing: 2px;
+  text-shadow: 0 5px 10px rgba(0, 0, 0, 0.7);
+  font-family: 'Cinzel', 'Noto Serif KR', 'Noto Serif JP', serif;
+  text-transform: uppercase;
 }
 
 /* 최종 스탯 */
@@ -612,21 +876,23 @@
 }
 
 .restart-button, .back-button {
-  padding: 16px 32px;
-  border: 2px solid #f8f9fa;
-  border-radius: 15px;
-  font-size: 16px;
-  font-weight: 600;
+  padding: 18px 36px;
+  border: 3px solid #f8f9fa;
+  border-radius: 18px;
+  font-size: 18px;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.3s ease;
-  letter-spacing: -0.3px;
+  letter-spacing: 1px;
   box-shadow: 
-    0 8px 15px rgba(0, 0, 0, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    0 10px 20px rgba(0, 0, 0, 0.3),
+    inset 0 2px 0 rgba(255, 255, 255, 0.3);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
   pointer-events: auto;
   z-index: 10;
   position: relative;
+  font-family: 'Cinzel', 'Noto Serif KR', 'Noto Serif JP', serif;
+  text-transform: uppercase;
 }
 
 .restart-button {
@@ -742,87 +1008,76 @@
   }
 
   .story-image {
-    max-height: 150px;
+    max-height: min(18vh, 150px);
   }
 }
 
 @media (max-width: 480px) {
-  .stats-container-mobile {
-    padding: 20px 15px;
-    gap: 30px;
+  .reigns-game-mobile::after {
+    width: clamp(40px, 10vw, 60px);
+    height: clamp(40px, 10vw, 60px);
+    top: clamp(3%, 5vh, 8%);
+    right: clamp(5%, 8vw, 12%);
   }
-
+  
+  .story-card-mobile {
+    width: clamp(280px, 95vw, 400px);
+    height: clamp(400px, 75vh, 600px);
+    max-height: calc(100vh - 100px);
+    border-radius: clamp(12px, 2.5vw, 20px);
+  }
+  
+  .stats-container-mobile {
+    gap: clamp(15px, 4vw, 25px);
+    padding: clamp(15px, 3vh, 20px) clamp(10px, 2vw, 15px);
+  }
+  
   .stat-mobile span {
-    font-size: 16px;
+    font-size: clamp(12px, 2.2vw, 16px);
   }
 
   .stat-bar-mobile {
-    height: 35px;
-  }
-
-  .story-card-mobile {
-    width: 90%;
-    height: 400px;
-  }
-
-  .card-content {
-    padding: 30px 20px;
-  }
-
-  .card-content h3 {
-    font-size: 20px;
-  }
-
-  .card-content p {
-    font-size: 14px;
-  }
-
-  .choice-button-mobile {
-    padding: 14px 18px;
-    font-size: 13px;
+    height: clamp(35px, 5vh, 45px);
   }
 
   .card-container {
-    padding: 80px 15px;
+    padding: clamp(10px, 2vh, 15px);
   }
-
-  .choice-hint-side {
-    font-size: 11px;
-    padding: 8px 12px;
-    max-width: 120px;
+  
+  .card-content {
+    padding: clamp(15px, 3vh, 25px) clamp(20px, 4vw, 30px);
   }
-
-  .choice-hint-side.left {
-    left: -100px;
-    transform: translateY(-50%) translateX(-10px) scale(0.8);
+  
+  .card-content h3 {
+    font-size: clamp(18px, 4.5vw, 26px);
+    margin-bottom: clamp(10px, 2vh, 15px);
   }
-
-  .choice-hint-side.right {
-    right: -100px;
-    transform: translateY(-50%) translateX(10px) scale(0.8);
+  
+  .story-line, .card-content p {
+    font-size: clamp(14px, 3.2vw, 18px);
+    line-height: 1.4;
   }
-
-  .choice-hint-side.left.active {
-    left: -85px;
-    transform: translateY(-50%) translateX(0) scale(0.85);
+  
+  .choice-button-mobile {
+    font-size: clamp(12px, 2.8vw, 16px);
+    padding: clamp(10px, 2.5vh, 15px) clamp(15px, 3.5vw, 22px);
+    min-height: clamp(40px, 8vh, 55px);
   }
-
-  .choice-hint-side.right.active {
-    right: -85px;
-    transform: translateY(-50%) translateX(0) scale(0.85);
+  
+  .choice-buttons-mobile {
+    padding: clamp(15px, 3vh, 20px) clamp(15px, 3vw, 25px) clamp(15px, 3vh, 20px) clamp(15px, 3vw, 25px);
+    gap: clamp(8px, 2vh, 12px);
   }
-
-  .hint-arrow {
-    font-size: 14px;
+  
+  .controls-mobile {
+    top: clamp(10px, 2vh, 15px);
+    right: clamp(10px, 2vw, 15px);
+    gap: clamp(8px, 1.5vw, 12px);
   }
-
-  .drag-indicator {
-    top: -40px;
-  }
-
-  .drag-direction {
-    font-size: 11px;
-    padding: 5px 10px;
+  
+  .control-button {
+    padding: clamp(8px, 1.5vh, 12px) clamp(12px, 2.5vw, 18px);
+    font-size: clamp(10px, 2.2vw, 14px);
   }
 }
 
@@ -893,29 +1148,29 @@
   transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
-/* 스토리 이미지 스타일 */
+/* 스토리 이미지 스타일 - 화면 비율에 맞게 조정 */
 .story-image-container {
-  margin: 1rem 0;
-  border-radius: 8px;
+  margin: clamp(15px, 3vh, 20px) 0;
+  border-radius: 15px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  max-height: 30vh;
 }
 
 .story-image {
-  width: 100%;
-  max-height: 200px;
-  object-fit: cover;
-  border-radius: 8px;
-  transition: transform 0.2s ease;
+  max-width: 100%;
+  max-height: min(25vh, 250px);
+  object-fit: contain;
+  border-radius: 15px;
+  transition: transform 0.3s ease;
 }
 
 .story-image:hover {
   transform: scale(1.02);
 }
 
-/* 모바일에서 이미지 크기 조정 */
-@media (max-width: 768px) {
-  .story-image {
-    max-height: 150px;
-  }
-}
+/* 모든 화면에서 일정한 크기 유지 - 미디어 쿼리 제거 */

@@ -119,8 +119,8 @@ function MindMapFlow() {
   );
 
   useEffect(() => {
-    console.log('노드 상태:', nodes);
-    console.log('엣지 상태:', edges);
+    console.log('Nodes state:', nodes);
+    console.log('Edges state:', edges);
   }, [nodes, edges]);
 
   // 빈 공간 더블클릭으로 노드 추가
@@ -424,7 +424,6 @@ function MindMapFlow() {
   if (gameMode) {
     return (
       <div className="app-container">
-        <LanguageSelector className="game-mode" />
         <ReignsGame 
           nodes={nodes} 
           edges={edges} 

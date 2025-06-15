@@ -130,7 +130,7 @@ const ReignsGame = ({ nodes, edges, onBackToEditor, gameConfig }) => {
 
   // 게임 재시작
   const restartGame = () => {
-    console.log('재시작 버튼 클릭됨');
+    console.log('Restart button clicked');
     setCurrentNodeId(null);
     setGameStats(gameConfig?.initialStats || {
       health: 50,
@@ -142,11 +142,11 @@ const ReignsGame = ({ nodes, edges, onBackToEditor, gameConfig }) => {
 
   // 에디터로 돌아가기 함수
   const handleBackToEditor = () => {
-    console.log('에디터 버튼 클릭됨', onBackToEditor);
+    console.log('Back to editor button clicked', onBackToEditor);
     if (onBackToEditor) {
       onBackToEditor();
     } else {
-      console.error('onBackToEditor 함수가 전달되지 않았습니다');
+      console.error('onBackToEditor function not provided');
     }
   };
 
