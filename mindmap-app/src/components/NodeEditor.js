@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import './NodeEditor.css';
+import useTranslation from '../hooks/useTranslation';
 
 const NodeEditor = ({ node, nodes, edges, gameConfig, onSave, onClose, onGenerateStory }) => {
+  const { t } = useTranslation();
   const [nodeData, setNodeData] = useState({
     label: '',
     story: '',
     choice: '',
+    imageUrl: '',
     statChanges: {
       health: 0,
       wealth: 0,
@@ -14,6 +17,8 @@ const NodeEditor = ({ node, nodes, edges, gameConfig, onSave, onClose, onGenerat
     }
   });
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [imagePreview, setImagePreview] = useState(null);
 
   useEffect(() => {
     if (node) {
@@ -21,6 +26,7 @@ const NodeEditor = ({ node, nodes, edges, gameConfig, onSave, onClose, onGenerat
         label: node.data.label || '',
         story: node.data.story || '',
         choice: node.data.choice || '',
+        imageUrl: node.data.imageUrl || '',
         statChanges: node.data.statChanges || {
           health: 0,
           wealth: 0,
@@ -28,8 +34,15 @@ const NodeEditor = ({ node, nodes, edges, gameConfig, onSave, onClose, onGenerat
           power: 0
         }
       });
+      
+      if (node.data.imageUrl) {
+        const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000';
+        setImagePreview(`${backendUrl}${node.data.imageUrl}`);
+      } else {
+        setImagePreview(null);
+      }
     }
-  }, [node]); // node가 변경될 때만 업데이트
+  }, [node]);
 
   const handleSave = () => {
     onSave({
@@ -39,6 +52,7 @@ const NodeEditor = ({ node, nodes, edges, gameConfig, onSave, onClose, onGenerat
         label: nodeData.label,
         story: nodeData.story,
         choice: nodeData.choice,
+        imageUrl: nodeData.imageUrl,
         statChanges: nodeData.statChanges
       }
     });
@@ -62,7 +76,6 @@ const NodeEditor = ({ node, nodes, edges, gameConfig, onSave, onClose, onGenerat
     }));
   };
 
-  // 노드의 부모와 자식 찾기
   const getNodeRelations = () => {
     const parents = edges
       .filter(edge => edge.target === node.id)
@@ -77,10 +90,9 @@ const NodeEditor = ({ node, nodes, edges, gameConfig, onSave, onClose, onGenerat
     return { parents, children };
   };
 
-  // AI 스토리 생성
   const handleGenerateStory = async () => {
     if (!onGenerateStory) {
-      alert('스토리 생성 기능이 사용할 수 없습니다.');
+      alert(t('storyGenerationUnavailable'));
       return;
     }
 
@@ -88,7 +100,6 @@ const NodeEditor = ({ node, nodes, edges, gameConfig, onSave, onClose, onGenerat
     try {
       const { parents, children } = getNodeRelations();
       
-      // 현재 노드 데이터를 업데이트된 상태로 생성
       const currentNodeWithUpdatedData = {
         ...node,
         data: {
@@ -96,11 +107,11 @@ const NodeEditor = ({ node, nodes, edges, gameConfig, onSave, onClose, onGenerat
           label: nodeData.label,
           story: nodeData.story,
           choice: nodeData.choice,
+          imageUrl: nodeData.imageUrl,
           statChanges: nodeData.statChanges
         }
       };
 
-      // App.js의 handleGenerateStory 함수 호출
       await onGenerateStory({
         currentNode: currentNodeWithUpdatedData,
         parentNodes: parents,
@@ -110,14 +121,106 @@ const NodeEditor = ({ node, nodes, edges, gameConfig, onSave, onClose, onGenerat
         allEdges: edges
       });
 
-      // 스토리 생성 후 노드 데이터 새로고침
-      // App.js에서 노드가 업데이트되면 useEffect를 통해 자동으로 반영됨
-      
     } catch (error) {
       console.error('스토리 생성 실패:', error);
-      alert('스토리 생성에 실패했습니다. 백엔드 서버가 실행 중인지 확인해주세요.');
+      alert(t('storyGenerationFailed'));
     } finally {
       setIsGenerating(false);
+    }
+  };
+
+  const handleImageUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    console.log('이미지 업로드 시작:', file.name, file.type, file.size);
+
+    if (!file.type.startsWith('image/')) {
+      alert(t('imageFilesOnly'));
+      return;
+    }
+
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+      alert(t('fileSizeLimit'));
+      return;
+    }
+
+    setIsUploadingImage(true);
+    
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000';
+      const uploadUrl = `${backendUrl}/api/upload-image`;
+      
+      console.log('업로드 URL:', uploadUrl);
+      console.log('업로드 요청 시작');
+      
+      const response = await fetch(uploadUrl, {
+        method: 'POST',
+        body: formData,
+      });
+      
+      console.log('응답 상태:', response.status, response.statusText);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('서버 응답 오류:', errorText);
+        throw new Error(`서버 오류 (${response.status}): ${errorText}`);
+      }
+      
+      const result = await response.json();
+      console.log('업로드 성공:', result);
+      
+      setNodeData(prev => ({
+        ...prev,
+        imageUrl: result.imageUrl
+      }));
+      
+      setImagePreview(`${backendUrl}${result.imageUrl}`);
+      
+      alert(t('imageUploadSuccess'));
+      
+    } catch (error) {
+      console.error('이미지 업로드 실패:', error);
+      
+      if (error.message.includes('fetch')) {
+        alert(t('serverConnectionError'));
+      } else {
+        alert(t('imageUploadError') + `: ${error.message}`);
+      }
+    } finally {
+      setIsUploadingImage(false);
+    }
+  };
+
+  const handleImageRemove = async () => {
+    if (!nodeData.imageUrl) return;
+    
+    try {
+      const filename = nodeData.imageUrl.split('/').pop();
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000';
+      
+      await fetch(`${backendUrl}/api/delete-image/${filename}`, {
+        method: 'DELETE',
+      });
+      
+      setNodeData(prev => ({
+        ...prev,
+        imageUrl: ''
+      }));
+      
+      setImagePreview(null);
+      
+    } catch (error) {
+      console.error('이미지 삭제 실패:', error);
+      setNodeData(prev => ({
+        ...prev,
+        imageUrl: ''
+      }));
+      setImagePreview(null);
     }
   };
 
@@ -127,7 +230,7 @@ const NodeEditor = ({ node, nodes, edges, gameConfig, onSave, onClose, onGenerat
     <div className="node-editor-overlay">
       <div className="node-editor">
         <div className="editor-header">
-          <h3>노드 편집</h3>
+          <h3>{t('nodeEditor')}</h3>
           <button className="close-button" onClick={onClose}>
             ✕
           </button>
@@ -135,61 +238,119 @@ const NodeEditor = ({ node, nodes, edges, gameConfig, onSave, onClose, onGenerat
         
         <div className="editor-content">
           <div className="form-group">
-            <label htmlFor="node-label">노드 제목</label>
+            <label htmlFor="node-label">{t('nodeTitle')}</label>
             <input
               id="node-label"
               type="text"
               value={nodeData.label}
               onChange={(e) => handleInputChange('label', e.target.value)}
-              placeholder="노드의 제목을 입력하세요"
+              placeholder={t('enterNodeTitle')}
             />
           </div>
 
           <div className="form-group">
             <div className="story-header">
-              <label htmlFor="node-story">스토리 내용</label>
+              <label htmlFor="node-story">{t('story')}</label>
               <button 
                 className="generate-story-button"
                 onClick={handleGenerateStory}
                 disabled={isGenerating}
                 type="button"
               >
-                {isGenerating ? '🔄 생성 중...' : '✨ AI 스토리 생성'}
+                {isGenerating ? '🔄 ' + t('generating') + '...' : '✨ ' + t('generateStory')}
               </button>
             </div>
             <textarea
               id="node-story"
               value={nodeData.story}
               onChange={(e) => handleInputChange('story', e.target.value)}
-              placeholder="이 상황에서 일어나는 스토리를 작성하세요..."
+              placeholder={t('writeStoryHere')}
               rows={6}
             />
           </div>
 
           <div className="form-group">
-            <label htmlFor="node-choice">선택지 텍스트</label>
+            <label htmlFor="node-choice">{t('choice')}</label>
             <input
               id="node-choice"
               type="text"
               value={nodeData.choice}
               onChange={(e) => handleInputChange('choice', e.target.value)}
-              placeholder="이 노드로 이어지는 선택지 텍스트 (선택사항)"
+              placeholder={t('choiceTextOptional')}
             />
           </div>
 
           <div className="form-group">
-            <label>스탯 변화 설정</label>
+            <label>🖼️ {t('imageUpload')}</label>
+            <div className="image-upload-section">
+              {imagePreview ? (
+                <div className="image-preview-container">
+                  <img 
+                    src={imagePreview} 
+                    alt={t('storyImagePreview')} 
+                    className="image-preview"
+                  />
+                  <div className="image-actions">
+                    <label className="image-upload-button">
+                      🔄 {t('changeImage')}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        disabled={isUploadingImage}
+                        style={{ display: 'none' }}
+                      />
+                    </label>
+                    <button 
+                      type="button"
+                      className="image-remove-button"
+                      onClick={handleImageRemove}
+                      disabled={isUploadingImage}
+                    >
+                      🗑️ {t('delete')}
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="image-upload-container">
+                  <label className="image-upload-button">
+                    {isUploadingImage ? '📤 ' + t('uploading') + '...' : '📷 ' + t('addImage')}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      disabled={isUploadingImage}
+                      style={{ display: 'none' }}
+                    />
+                  </label>
+                  <small className="image-help">
+                    {t('imageHelp')}<br/>
+                    {t('imageFormats')}
+                  </small>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label>{t('statChanges')}</label>
             <div className="stat-changes-grid">
               {Object.entries(nodeData.statChanges).map(([statKey, value]) => {
-                const statLabels = {
-                  health: '❤️ 체력',
-                  wealth: '💰 재력',
-                  happiness: '😊 행복',
-                  power: '👑 권력'
+                const statIcons = gameConfig?.statIcons || {
+                  health: '❤️',
+                  wealth: '💰',
+                  happiness: '😊',
+                  power: '👑'
+                };
+                const statNames = gameConfig?.statNames || {
+                  health: t('stat') + ' 1',
+                  wealth: t('stat') + ' 2',
+                  happiness: t('stat') + ' 3',
+                  power: t('stat') + ' 4'
                 };
                 return (
                   <div key={statKey} className="stat-change-item">
-                    <label>{statLabels[statKey]}</label>
+                    <label>{statIcons[statKey]} {statNames[statKey]}</label>
                     <input
                       type="number"
                       min="-50"
@@ -203,27 +364,27 @@ const NodeEditor = ({ node, nodes, edges, gameConfig, onSave, onClose, onGenerat
               })}
             </div>
             <div className="stat-help">
-              <small>-50 ~ +50 범위로 설정 (0은 변화 없음)</small>
+              <small>{t('statChangeRange')}</small>
             </div>
           </div>
 
           <div className="editor-help">
-            <h4>💡 사용 팁</h4>
+            <h4>💡 {t('usageTips')}</h4>
             <ul>
-              <li><strong>노드 제목:</strong> 상황의 간단한 요약</li>
-              <li><strong>스토리 내용:</strong> 플레이어에게 보여질 상세한 상황 설명</li>
-              <li><strong>선택지 텍스트:</strong> 다른 노드에서 이 노드로 오는 선택지의 텍스트</li>
-              <li><strong>스탯 변화:</strong> 이 선택지를 선택했을 때 변화할 스탯 수치</li>
+              <li><strong>{t('nodeTitle')}:</strong> {t('usageTipItems.nodeTitle')}</li>
+              <li><strong>{t('storyContent')}:</strong> {t('usageTipItems.storyContent')}</li>
+              <li><strong>{t('choiceText')}:</strong> {t('usageTipItems.choiceText')}</li>
+              <li><strong>{t('statChanges')}:</strong> {t('usageTipItems.statChanges')}</li>
             </ul>
           </div>
         </div>
 
         <div className="editor-actions">
           <button className="cancel-button" onClick={onClose}>
-            취소
+            {t('cancel')}
           </button>
           <button className="save-button" onClick={handleSave}>
-            저장
+            {t('save')}
           </button>
         </div>
       </div>

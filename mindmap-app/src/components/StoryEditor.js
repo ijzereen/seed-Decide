@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useRef } from 'react';
 import './StoryEditor.css';
+import useTranslation from '../hooks/useTranslation';
 
 const StoryEditor = ({ 
   nodes, 
@@ -9,6 +10,7 @@ const StoryEditor = ({
   onGenerateStory, 
   onClose 
 }) => {
+  const { t } = useTranslation();
   const [selectedNodeId, setSelectedNodeId] = useState(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -118,11 +120,11 @@ const StoryEditor = ({
           {node.children?.length > 0 ? '📁' : '📄'}
         </div>
         <div className="tree-node-content">
-          <div className="tree-node-title">{node.data.label || `노드 ${node.id}`}</div>
+          <div className="tree-node-title">{node.data.label || `${t('node')} ${node.id}`}</div>
           <div className="tree-node-preview">
             {node.data.story ? 
               node.data.story.substring(0, 50) + (node.data.story.length > 50 ? '...' : '') :
-              '스토리 없음'
+              t('noStory')
             }
           </div>
         </div>
@@ -137,10 +139,10 @@ const StoryEditor = ({
         {/* 헤더 */}
         <div className="editor-header">
           <div className="header-left">
-            <h1 className="editor-title">Story Architect</h1>
+            <h1 className="editor-title">{t('storyArchitect')}</h1>
             <div className="project-info">
-              <span className="project-name">{gameConfig?.storyTitle || '제목 없음'}</span>
-              <span className="node-count">{nodes.length} nodes</span>
+              <span className="project-name">{gameConfig?.storyTitle || t('noTitle')}</span>
+              <span className="node-count">{nodes.length} {t('nodes')}</span>
             </div>
           </div>
           <div className="header-right">
@@ -149,13 +151,13 @@ const StoryEditor = ({
                 className={`view-btn ${viewMode === 'tree' ? 'active' : ''}`}
                 onClick={() => setViewMode('tree')}
               >
-                🌳 Tree
+                🌳 {t('treeView')}
               </button>
               <button 
                 className={`view-btn ${viewMode === 'list' ? 'active' : ''}`}
                 onClick={() => setViewMode('list')}
               >
-                📋 List
+                📋 {t('listView')}
               </button>
             </div>
             <button className="close-btn" onClick={onClose}>✕</button>
@@ -169,7 +171,7 @@ const StoryEditor = ({
               <div className="search-box">
                 <input
                   type="text"
-                  placeholder="Search nodes..."
+                  placeholder={t('searchNodes') + '...'}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="search-input"
@@ -191,15 +193,15 @@ const StoryEditor = ({
                       className={`list-node-item ${selectedNodeId === node.id ? 'selected' : ''}`}
                       onClick={() => setSelectedNodeId(node.id)}
                     >
-                      <div className="list-node-title">{node.data.label || `노드 ${node.id}`}</div>
+                      <div className="list-node-title">{node.data.label || `${t('node')} ${node.id}`}</div>
                       <div className="list-node-preview">
                         {node.data.story ? 
                           node.data.story.substring(0, 80) + (node.data.story.length > 80 ? '...' : '') :
-                          '스토리 없음'
+                          t('noStory')
                         }
                       </div>
                       <div className="list-node-meta">
-                        {getNodeRelations(node.id).children.length} children
+                        {getNodeRelations(node.id).children.length} {t('children')}
                       </div>
                     </div>
                   ))}
@@ -214,9 +216,9 @@ const StoryEditor = ({
               <>
                 <div className="editor-toolbar">
                   <div className="node-path">
-                    <span className="path-item">Node {selectedNode.id}</span>
+                    <span className="path-item">{t('node')} {selectedNode.id}</span>
                     <span className="path-separator">•</span>
-                    <span className="path-item">{selectedNode.data.label || '제목 없음'}</span>
+                    <span className="path-item">{selectedNode.data.label || t('noTitle')}</span>
                   </div>
                   <div className="toolbar-actions">
                     <button 
@@ -224,59 +226,65 @@ const StoryEditor = ({
                       onClick={handleGenerateStory}
                       disabled={isGenerating}
                     >
-                      {isGenerating ? '🔄 Generating...' : '✨ Generate Story'}
+                      {isGenerating ? '🔄 ' + t('generating') + '...' : '✨ ' + t('generateStory')}
                     </button>
                   </div>
                 </div>
 
                 <div className="editor-content">
                   <div className="content-section">
-                    <label className="content-label">Node Title</label>
+                    <label className="content-label">{t('nodeTitle')}</label>
                     <input
                       type="text"
                       value={selectedNode.data.label || ''}
                       onChange={(e) => handleNodeUpdate('label', e.target.value)}
                       className="title-input"
-                      placeholder="Enter node title..."
+                      placeholder={t('enterNodeTitle') + '...'}
                     />
                   </div>
 
                   <div className="content-section">
-                    <label className="content-label">Story Content</label>
+                    <label className="content-label">{t('storyContent')}</label>
                     <textarea
                       value={selectedNode.data.story || ''}
                       onChange={(e) => handleNodeUpdate('story', e.target.value)}
                       className="story-textarea"
-                      placeholder="Write your story here..."
+                      placeholder={t('writeStoryHere') + '...'}
                       rows={12}
                     />
                   </div>
 
                   <div className="content-section">
-                    <label className="content-label">Choice Text</label>
+                    <label className="content-label">{t('choiceText')}</label>
                     <input
                       type="text"
                       value={selectedNode.data.choice || ''}
                       onChange={(e) => handleNodeUpdate('choice', e.target.value)}
                       className="choice-input"
-                      placeholder="Text for choice leading to this node..."
+                      placeholder={t('choiceTextPlaceholder') + '...'}
                     />
                   </div>
 
                   {/* 스탯 변화 설정 */}
                   <div className="content-section">
-                    <label className="content-label">Stat Changes</label>
+                    <label className="content-label">{t('statChanges')}</label>
                     <div className="stats-grid">
                       {Object.entries(selectedNode.data.statChanges || {}).map(([statKey, value]) => {
                         const statLabels = {
-                          health: '❤️ Health',
-                          wealth: '💰 Wealth',
-                          happiness: '😊 Happiness',
-                          power: '👑 Power'
+                          health: gameConfig?.statIcons?.health || '❤️',
+                          wealth: gameConfig?.statIcons?.wealth || '💰',
+                          happiness: gameConfig?.statIcons?.happiness || '😊',
+                          power: gameConfig?.statIcons?.power || '👑'
+                        };
+                        const statNames = {
+                          health: gameConfig?.statNames?.health || t('stat') + ' 1',
+                          wealth: gameConfig?.statNames?.wealth || t('stat') + ' 2',
+                          happiness: gameConfig?.statNames?.happiness || t('stat') + ' 3',
+                          power: gameConfig?.statNames?.power || t('stat') + ' 4'
                         };
                         return (
                           <div key={statKey} className="stat-item">
-                            <label>{statLabels[statKey]}</label>
+                            <label>{statLabels[statKey]} {statNames[statKey]}</label>
                             <input
                               type="number"
                               min="-50"
@@ -302,7 +310,7 @@ const StoryEditor = ({
                 <div className="relations-section">
                   <div className="relations-grid">
                     <div className="relation-group">
-                      <h4>Parent Nodes</h4>
+                      <h4>{t('parentNodes')}</h4>
                       <div className="relation-items">
                         {getNodeRelations(selectedNode.id).parents.map(parent => (
                           <div 
@@ -310,16 +318,16 @@ const StoryEditor = ({
                             className="relation-item"
                             onClick={() => setSelectedNodeId(parent.id)}
                           >
-                            {parent.data.label || `Node ${parent.id}`}
+                            {parent.data.label || `${t('node')} ${parent.id}`}
                           </div>
                         ))}
                         {getNodeRelations(selectedNode.id).parents.length === 0 && (
-                          <div className="no-relations">No parent nodes</div>
+                          <div className="no-relations">{t('noParentNodes')}</div>
                         )}
                       </div>
                     </div>
                     <div className="relation-group">
-                      <h4>Child Nodes</h4>
+                      <h4>{t('childNodes')}</h4>
                       <div className="relation-items">
                         {getNodeRelations(selectedNode.id).children.map(child => (
                           <div 
@@ -327,11 +335,11 @@ const StoryEditor = ({
                             className="relation-item"
                             onClick={() => setSelectedNodeId(child.id)}
                           >
-                            {child.data.label || `Node ${child.id}`}
+                            {child.data.label || `${t('node')} ${child.id}`}
                           </div>
                         ))}
                         {getNodeRelations(selectedNode.id).children.length === 0 && (
-                          <div className="no-relations">No child nodes</div>
+                          <div className="no-relations">{t('noChildNodes')}</div>
                         )}
                       </div>
                     </div>
@@ -342,8 +350,8 @@ const StoryEditor = ({
               <div className="no-selection">
                 <div className="no-selection-content">
                   <div className="no-selection-icon">📝</div>
-                  <h3>Select a node to edit</h3>
-                  <p>Choose a node from the sidebar to start editing its story content.</p>
+                  <h3>{t('selectNodeToEdit')}</h3>
+                  <p>{t('chooseNodeFromSidebar')}</p>
                 </div>
               </div>
             )}

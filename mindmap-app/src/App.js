@@ -17,7 +17,9 @@ import ReignsGame from './components/ReignsGame';
 import NodeEditor from './components/NodeEditor';
 import GameConfig from './components/GameConfig';
 import StoryEditor from './components/StoryEditor';
+import LanguageSelector from './components/LanguageSelector';
 import { createSampleStory, createFantasyAdventureStory } from './components/SampleStories';
+import useTranslation from './hooks/useTranslation';
 
 const STORAGE_KEY = 'mindmap-data';
 
@@ -66,6 +68,7 @@ const initialNodes = savedData.nodes;
 const initialEdges = savedData.edges;
 
 function MindMapFlow() {
+  const { t } = useTranslation();
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [nodeId, setNodeId] = useState(savedData.nodeId);
@@ -75,13 +78,19 @@ function MindMapFlow() {
   const [showGameConfig, setShowGameConfig] = useState(false);
   const [showStoryEditor, setShowStoryEditor] = useState(false);
   const [gameConfig, setGameConfig] = useState(savedData.gameConfig || {
-    storyTitle: '나만의 스토리',
-    storyDescription: '선택을 통해 이야기를 만들어가세요',
+    storyTitle: t('appTitle'),
+    storyDescription: t('appTitle'),
     statNames: {
-      health: '체력',
-      wealth: '재력',
-      happiness: '행복',
-      power: '권력'
+      health: t('stat') + ' 1',
+      wealth: t('stat') + ' 2',
+      happiness: t('stat') + ' 3',
+      power: t('stat') + ' 4'
+    },
+    statIcons: {
+      health: '❤️',
+      wealth: '💰',
+      happiness: '😊',
+      power: '👑'
     },
     initialStats: {
       health: 50,
@@ -126,7 +135,7 @@ function MindMapFlow() {
 
         const newNode = createNewNode(
           nodeId,
-          `노드 ${nodeId}`,
+          t('node') + ` ${nodeId}`,
           position
         );
 
@@ -134,7 +143,7 @@ function MindMapFlow() {
         setNodeId((id) => id + 1);
       }
     },
-    [project, nodeId, setNodes],
+    [project, nodeId, setNodes, t],
   );
 
   // 노드 더블클릭으로 편집
@@ -161,11 +170,11 @@ function MindMapFlow() {
   // 게임 모드 전환
   const toggleGameMode = useCallback(() => {
     if (nodes.length === 0) {
-      alert('게임을 시작하려면 최소 하나의 노드가 필요합니다.');
+      alert(t('noNodesMessage'));
       return;
     }
     setGameMode(!gameMode);
-  }, [gameMode, nodes.length]);
+  }, [gameMode, nodes.length, t]);
 
   // 노드 선택 변경 처리
   const onSelectionChange = useCallback(
@@ -204,18 +213,19 @@ function MindMapFlow() {
 
   // 모든 노드와 엣지 삭제
   const clearAll = useCallback(() => {
-    setNodes([]);
-    setEdges([]);
-    setNodeId(1);
-    // localStorage도 초기화
-    localStorage.removeItem(STORAGE_KEY);
-  }, [setNodes, setEdges]);
+    if (window.confirm(t('clearAll') + '?')) {
+      setNodes([]);
+      setEdges([]);
+      setNodeId(1);
+      setSelectedNodes([]);
+    }
+  }, [setNodes, setEdges, t]);
 
   // 수동 저장 함수
   const saveData = useCallback(() => {
     saveToStorage(nodes, edges, nodeId, gameConfig);
-    alert('데이터가 저장되었습니다!');
-  }, [nodes, edges, nodeId, gameConfig]);
+    alert(t('dataSaved'));
+  }, [nodes, edges, nodeId, gameConfig, t]);
 
   // 데이터 내보내기 (JSON 파일로 다운로드)
   const exportData = useCallback(() => {
@@ -255,13 +265,13 @@ function MindMapFlow() {
             setGameConfig(data.gameConfig);
           }
           saveToStorage(data.nodes, data.edges, data.nodeId || data.nodes.length + 1, data.gameConfig);
-          alert('데이터를 성공적으로 불러왔습니다!');
+          alert(t('dataLoadedSuccessfully'));
         } else {
-          alert('올바르지 않은 파일 형식입니다.');
+          alert(t('invalidFileFormat'));
         }
       } catch (error) {
         console.error('파일 로드 실패:', error);
-        alert('파일을 읽는 중 오류가 발생했습니다.');
+        alert(t('fileReadError'));
       }
     };
     reader.readAsText(file);
@@ -314,18 +324,20 @@ function MindMapFlow() {
 
   // 샘플 스토리 로드
   const loadSampleStory = useCallback(() => {
-    const { nodes: sampleNodes, edges: sampleEdges } = createSampleStory();
-    setNodes(sampleNodes);
-    setEdges(sampleEdges);
-    setNodeId(sampleNodes.length + 1);
+    const sampleData = createSampleStory();
+    setNodes(sampleData.nodes);
+    setEdges(sampleData.edges);
+    setNodeId(sampleData.nodeId);
+    setSelectedNodes([]);
   }, [setNodes, setEdges]);
 
   // 판타지 모험 스토리 로드
   const loadFantasyStory = useCallback(() => {
-    const { nodes: fantasyNodes, edges: fantasyEdges } = createFantasyAdventureStory();
-    setNodes(fantasyNodes);
-    setEdges(fantasyEdges);
-    setNodeId(fantasyNodes.length + 1);
+    const fantasyData = createFantasyAdventureStory();
+    setNodes(fantasyData.nodes);
+    setEdges(fantasyData.edges);
+    setNodeId(fantasyData.nodeId);
+    setSelectedNodes([]);
   }, [setNodes, setEdges]);
 
   // 게임 설정 저장
@@ -411,59 +423,76 @@ function MindMapFlow() {
   // 게임 모드일 때 게임 컴포넌트 렌더링
   if (gameMode) {
     return (
-      <ReignsGame 
-        nodes={nodes} 
-        edges={edges} 
-        gameConfig={gameConfig}
-        onBackToEditor={() => setGameMode(false)} 
-      />
+      <div className="app-container">
+        <LanguageSelector className="game-mode" />
+        <ReignsGame 
+          nodes={nodes} 
+          edges={edges} 
+          onBackToEditor={() => setGameMode(false)}
+          gameConfig={gameConfig}
+        />
+      </div>
     );
   }
 
   return (
-    <div className="App" style={{ width: '100vw', height: '100vh' }}>
-      {/* 상단 툴바 */}
+    <div className="app-container">
       <div className="toolbar">
-        <button onClick={loadSampleStory} className="toolbar-button">
-          👑 왕국 스토리
-        </button>
-        <button onClick={loadFantasyStory} className="toolbar-button">
-          🧙‍♂️ 판타지 모험
-        </button>
-        <div className="toolbar-divider"></div>
-        <button onClick={clearAll} className="toolbar-button">
-          🗑️ 전체 삭제
-        </button>
-        <button onClick={deleteSelectedNodes} className="toolbar-button" disabled={selectedNodes.length === 0}>
-          ❌ 선택 삭제
-        </button>
-        <div className="toolbar-divider"></div>
-        <button onClick={saveData} className="toolbar-button">
-          💾 저장
-        </button>
-        <button onClick={exportData} className="toolbar-button" disabled={nodes.length === 0}>
-          📤 내보내기
-        </button>
-        <label className="toolbar-button file-input-label">
-          📥 가져오기
-          <input
-            type="file"
-            accept=".json"
-            onChange={importData}
-            style={{ display: 'none' }}
-          />
-        </label>
-        <button onClick={() => setShowGameConfig(true)} className="toolbar-button">
-          ⚙️ 게임 설정
-        </button>
-        <button onClick={() => setShowStoryEditor(true)} className="toolbar-button" disabled={nodes.length === 0}>
-          📝 스토리 에디터
-        </button>
-        <button onClick={toggleGameMode} className="toolbar-button game-button" disabled={nodes.length === 0}>
-          🎮 게임 시작
-        </button>
-        <div className="toolbar-info">
-          💡 더블클릭: 노드 추가/편집 | 드래그: 노드 연결 | Delete키: 삭제
+        <div className="toolbar-left">
+          <button 
+            className="toolbar-button primary" 
+            onClick={toggleGameMode}
+            disabled={nodes.length === 0}
+          >
+            🎮 {t('gameMode')}
+          </button>
+          <button 
+            className="toolbar-button" 
+            onClick={() => setShowStoryEditor(true)}
+          >
+            ✨ {t('storyEditor')}
+          </button>
+          <button 
+            className="toolbar-button" 
+            onClick={() => setShowGameConfig(true)}
+          >
+            ⚙️ {t('gameConfig')}
+          </button>
+          <button 
+            className="toolbar-button" 
+            onClick={saveData}
+          >
+            💾 {t('save')}
+          </button>
+          <button 
+            className="toolbar-button" 
+            onClick={exportData}
+          >
+            📤 {t('export')}
+          </button>
+          <label className="toolbar-button" style={{ cursor: 'pointer' }}>
+            📥 {t('import')}
+            <input 
+              type="file" 
+              accept=".json" 
+              onChange={importData}
+              style={{ display: 'none' }}
+            />
+          </label>
+        </div>
+        <div className="toolbar-center">
+          <button className="toolbar-button secondary" onClick={loadSampleStory}>
+            📖 {t('sampleStory')}
+          </button>
+          <button className="toolbar-button secondary" onClick={loadFantasyStory}>
+            🏰 {t('fantasyAdventure')}
+          </button>
+          <button className="toolbar-button danger" onClick={clearAll}>
+            🗑️ {t('clearAll')}
+          </button>
+        </div>
+        <div className="toolbar-right">
+          <LanguageSelector className="editor-mode" />
         </div>
       </div>
 

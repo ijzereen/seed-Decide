@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import './ReignsGame.css';
+import useTranslation from '../hooks/useTranslation';
 
 const ReignsGame = ({ nodes, edges, onBackToEditor, gameConfig }) => {
+  const { t } = useTranslation();
   const [currentNodeId, setCurrentNodeId] = useState(null);
   const [gameStats, setGameStats] = useState(
     gameConfig?.initialStats || {
@@ -192,20 +194,27 @@ const ReignsGame = ({ nodes, edges, onBackToEditor, gameConfig }) => {
   const currentNode = getCurrentNode();
   const choices = getChoices();
   const statNames = gameConfig?.statNames || {
-    health: '체력',
-    wealth: '재력', 
-    happiness: '행복',
-    power: '권력'
+    health: t('stat') + ' 1',
+    wealth: t('stat') + ' 2', 
+    happiness: t('stat') + ' 3',
+    power: t('stat') + ' 4'
+  };
+  
+  const statIcons = gameConfig?.statIcons || {
+    health: '❤️',
+    wealth: '💰',
+    happiness: '😊',
+    power: '👑'
   };
 
   if (!currentNode) {
     return (
       <div className="reigns-game-mobile">
         <div className="game-message">
-          <h2>게임을 시작할 수 없습니다</h2>
-          <p>노드가 없거나 연결되지 않았습니다.</p>
+          <h2>{t('cannotStartGame')}</h2>
+          <p>{t('noNodesOrConnection')}</p>
           <button onClick={handleBackToEditor} className="back-button">
-            에디터로 돌아가기
+            {t('backToEditor')}
           </button>
         </div>
       </div>
@@ -216,7 +225,7 @@ const ReignsGame = ({ nodes, edges, onBackToEditor, gameConfig }) => {
     return (
       <div className="reigns-game-mobile">
         <div className="game-over">
-          <h2>게임 오버!</h2>
+          <h2>{t('gameOver')}</h2>
           <div className="final-stats">
             {Object.entries(gameStats).map(([key, value]) => (
               <div key={key} className="stat">
@@ -232,10 +241,10 @@ const ReignsGame = ({ nodes, edges, onBackToEditor, gameConfig }) => {
           </div>
           <div className="game-over-buttons">
             <button onClick={restartGame} className="restart-button">
-              다시 시작
+              {t('restart')}
             </button>
             <button onClick={handleBackToEditor} className="back-button">
-              에디터로 돌아가기
+              {t('backToEditor')}
             </button>
           </div>
         </div>
@@ -247,20 +256,17 @@ const ReignsGame = ({ nodes, edges, onBackToEditor, gameConfig }) => {
     <div className="reigns-game-mobile">
       {/* 상단 스탯 바 */}
       <div className="stats-container-mobile">
-        {Object.entries(gameStats).map(([key, value], index) => {
-          const icons = ['❤️', '💰', '😊', '👑'];
-          return (
-            <div key={key} className="stat-mobile">
-              <span>{icons[index]} {value}</span>
-              <div className="stat-bar-mobile">
-                <div 
-                  className={`stat-fill ${key}`} 
-                  style={{ height: `${value}%` }}
-                />
-              </div>
+        {Object.entries(gameStats).map(([key, value]) => (
+          <div key={key} className="stat-mobile">
+            <span>{statIcons[key]} {value}</span>
+            <div className="stat-bar-mobile">
+              <div 
+                className={`stat-fill ${key}`} 
+                style={{ height: `${value}%` }}
+              />
             </div>
-          );
-        })}
+          </div>
+        ))}
       </div>
 
       {/* 메인 카드 영역 */}
@@ -282,8 +288,23 @@ const ReignsGame = ({ nodes, edges, onBackToEditor, gameConfig }) => {
         >
           <div className="card-content">
             <h3>{currentNode.data.label}</h3>
+            
+            {/* 이미지가 있으면 표시 */}
+            {currentNode.data.imageUrl && (
+              <div className="story-image-container">
+                <img
+                  src={`${process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000'}${currentNode.data.imageUrl}`}
+                  alt="스토리 이미지"
+                  className="story-image"
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                  }}
+                />
+              </div>
+            )}
+            
             <div className="story-text">
-              {(currentNode.data.story || `${currentNode.data.label}에서 무엇을 하시겠습니까?`)
+              {(currentNode.data.story || `${currentNode.data.label}${t('story')}?`)
                 .split('\n')
                 .map((line, index) => (
                   <p key={index} className="story-line">
@@ -316,7 +337,7 @@ const ReignsGame = ({ nodes, edges, onBackToEditor, gameConfig }) => {
         {isDragging && (
           <div className="drag-indicator">
             <div className={`drag-direction ${cardOffset.x > 50 ? 'right' : cardOffset.x < -50 ? 'left' : 'center'}`}>
-              {cardOffset.x > 50 ? '오른쪽 선택지 →' : cardOffset.x < -50 ? '← 왼쪽 선택지' : '선택하세요'}
+              {cardOffset.x > 50 ? t('rightChoice') + ' →' : cardOffset.x < -50 ? '← ' + t('leftChoice') : t('choice')}
             </div>
           </div>
         )}
@@ -331,7 +352,7 @@ const ReignsGame = ({ nodes, edges, onBackToEditor, gameConfig }) => {
               className="choice-button-mobile left-choice"
               onClick={() => handleChoice(choices[0])}
             >
-              ← 왼쪽 선택지: {choices[0].data.choice || choices[0].data.label}
+              ← {t('leftChoice')}: {choices[0].data.choice || choices[0].data.label}
             </button>
           )}
           {choices[1] && (
@@ -340,7 +361,7 @@ const ReignsGame = ({ nodes, edges, onBackToEditor, gameConfig }) => {
               className="choice-button-mobile right-choice"
               onClick={() => handleChoice(choices[1])}
             >
-              오른쪽 선택지: {choices[1].data.choice || choices[1].data.label} →
+              {t('rightChoice')}: {choices[1].data.choice || choices[1].data.label} →
             </button>
           )}
         </div>
@@ -349,17 +370,17 @@ const ReignsGame = ({ nodes, edges, onBackToEditor, gameConfig }) => {
       {/* 키보드 안내 */}
       {choices.length > 0 && (
         <div className="keyboard-hint">
-          <span>💡 키보드: ← 왼쪽 선택지 | → 오른쪽 선택지</span>
+          <span>💡 {t('keyboardHint')}</span>
         </div>
       )}
 
       {/* 하단 컨트롤 */}
       <div className="controls-mobile">
         <button onClick={handleBackToEditor} className="control-button">
-          ← 에디터
+          ← {t('backToEditor').split(' ')[0]}
         </button>
         <button onClick={restartGame} className="control-button">
-          🔄 재시작
+          🔄 {t('restart')}
         </button>
       </div>
     </div>

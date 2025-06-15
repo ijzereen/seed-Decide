@@ -1,13 +1,25 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, File, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from typing import List, Dict, Any, Optional
 import os
 import json
 import httpx
+import uuid
+import shutil
 from datetime import datetime
+from pathlib import Path
 
 app = FastAPI(title="Story Generator API", version="1.0.0")
+
+# 이미지 업로드 디렉토리 생성
+UPLOAD_DIR = Path("uploads")
+UPLOAD_DIR.mkdir(exist_ok=True)
+
+# 정적 파일 서빙 설정
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 # CORS 설정
 app.add_middleware(
@@ -33,6 +45,7 @@ class NodeData(BaseModel):
     story: Optional[str] = None
     choice: Optional[str] = None
     statChanges: Optional[Dict[str, int]] = None
+    imageUrl: Optional[str] = None  # 이미지 URL 필드 추가
 
 class GameConfig(BaseModel):
     storyTitle: Optional[str] = None
@@ -334,6 +347,76 @@ async def analyze_story_structure(request: Dict[str, Any]):
             status_code=500,
             detail=f"Analysis failed: {str(e)}"
         )
+
+# 이미지 업로드 엔드포인트
+@app.post("/api/upload-image")
+async def upload_image(file: UploadFile = File(...)):
+    try:
+        print(f"이미지 업로드 시작: {file.filename}, 타입: {file.content_type}")
+        
+        # 파일 타입 검증
+        if not file.content_type or not file.content_type.startswith('image/'):
+            print(f"잘못된 파일 타입: {file.content_type}")
+            raise HTTPException(status_code=400, detail="이미지 파일만 업로드 가능합니다.")
+        
+        # 파일 크기 제한 (5MB)
+        max_size = 5 * 1024 * 1024  # 5MB
+        content = await file.read()
+        print(f"파일 크기: {len(content)} bytes")
+        
+        if len(content) > max_size:
+            print(f"파일 크기 초과: {len(content)} > {max_size}")
+            raise HTTPException(status_code=400, detail="파일 크기는 5MB 이하여야 합니다.")
+        
+        # 고유한 파일명 생성
+        if not file.filename or '.' not in file.filename:
+            file_extension = 'jpg'  # 기본 확장자
+        else:
+            file_extension = file.filename.split('.')[-1].lower()
+        
+        unique_filename = f"{uuid.uuid4()}.{file_extension}"
+        file_path = UPLOAD_DIR / unique_filename
+        
+        print(f"파일 저장 경로: {file_path}")
+        
+        # 파일 저장
+        with open(file_path, "wb") as buffer:
+            buffer.write(content)
+        
+        # 파일 URL 반환
+        file_url = f"/uploads/{unique_filename}"
+        print(f"파일 업로드 성공: {file_url}")
+        
+        return {"imageUrl": file_url, "filename": unique_filename}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"이미지 업로드 오류: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"이미지 업로드 중 오류가 발생했습니다: {str(e)}")
+
+# 이미지 삭제 엔드포인트
+@app.delete("/api/delete-image/{filename}")
+async def delete_image(filename: str):
+    try:
+        print(f"이미지 삭제 요청: {filename}")
+        file_path = UPLOAD_DIR / filename
+        
+        if file_path.exists():
+            file_path.unlink()
+            print(f"이미지 삭제 성공: {filename}")
+            return {"message": "이미지가 삭제되었습니다."}
+        else:
+            print(f"파일을 찾을 수 없음: {filename}")
+            raise HTTPException(status_code=404, detail="파일을 찾을 수 없습니다.")
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"이미지 삭제 오류: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"이미지 삭제 중 오류가 발생했습니다: {str(e)}")
 
 if __name__ == "__main__":
     import uvicorn

@@ -1,15 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import './GameConfig.css';
+import useTranslation from '../hooks/useTranslation';
 
 const GameConfig = ({ gameConfig, onSave, onClose }) => {
+  const { t } = useTranslation();
+  
+  // 사용 가능한 아이콘 목록
+  const availableIcons = [
+    '❤️', '💰', '😊', '👑', '⚡', '🛡️', '🧠', '💪', '🎯', '⭐', 
+    '🔥', '💎', '🏆', '🎨', '🔮', '⚔️', '🌟', '🎭', '🎪', '🎲',
+    '📚', '🔧', '🎵', '🌙', '☀️', '🌈', '🎃', '🎄', '🎁', '🎂'
+  ];
+
   const [config, setConfig] = useState({
     storyTitle: '',
     storyDescription: '',
     statNames: {
-      health: '체력',
-      wealth: '재력',
-      happiness: '행복',
-      power: '권력'
+      health: t('stat') + ' 1',
+      wealth: t('stat') + ' 2',
+      happiness: t('stat') + ' 3',
+      power: t('stat') + ' 4'
+    },
+    statIcons: {
+      health: '❤️',
+      wealth: '💰',
+      happiness: '😊',
+      power: '👑'
     },
     initialStats: {
       health: 50,
@@ -25,10 +41,16 @@ const GameConfig = ({ gameConfig, onSave, onClose }) => {
         storyTitle: gameConfig.storyTitle || '',
         storyDescription: gameConfig.storyDescription || '',
         statNames: gameConfig.statNames || {
-          health: '체력',
-          wealth: '재력',
-          happiness: '행복',
-          power: '권력'
+          health: t('stat') + ' 1',
+          wealth: t('stat') + ' 2',
+          happiness: t('stat') + ' 3',
+          power: t('stat') + ' 4'
+        },
+        statIcons: gameConfig.statIcons || {
+          health: '❤️',
+          wealth: '💰',
+          happiness: '😊',
+          power: '👑'
         },
         initialStats: gameConfig.initialStats || {
           health: 50,
@@ -38,7 +60,7 @@ const GameConfig = ({ gameConfig, onSave, onClose }) => {
         }
       });
     }
-  }, [gameConfig]);
+  }, [gameConfig, t]);
 
   const handleSave = () => {
     onSave(config);
@@ -62,6 +84,16 @@ const GameConfig = ({ gameConfig, onSave, onClose }) => {
     }));
   };
 
+  const handleStatIconChange = (statKey, icon) => {
+    setConfig(prev => ({
+      ...prev,
+      statIcons: {
+        ...prev.statIcons,
+        [statKey]: icon
+      }
+    }));
+  };
+
   const handleInitialStatChange = (statKey, value) => {
     setConfig(prev => ({
       ...prev,
@@ -76,7 +108,7 @@ const GameConfig = ({ gameConfig, onSave, onClose }) => {
     <div className="game-config-overlay">
       <div className="game-config">
         <div className="config-header">
-          <h3>게임 설정</h3>
+          <h3>{t('gameSettings')}</h3>
           <button className="close-button" onClick={onClose}>
             ✕
           </button>
@@ -84,100 +116,104 @@ const GameConfig = ({ gameConfig, onSave, onClose }) => {
         
         <div className="config-content">
           <div className="form-group">
-            <label htmlFor="story-title">스토리 제목</label>
+            <label htmlFor="story-title">{t('storyTitle')}</label>
             <input
               id="story-title"
               type="text"
               value={config.storyTitle}
               onChange={(e) => handleInputChange('storyTitle', e.target.value)}
-              placeholder="스토리의 제목을 입력하세요"
+              placeholder={t('storyTitle')}
             />
           </div>
 
           <div className="form-group">
-            <label htmlFor="story-description">스토리 설명</label>
+            <label htmlFor="story-description">{t('storyDescription')}</label>
             <textarea
               id="story-description"
               value={config.storyDescription}
               onChange={(e) => handleInputChange('storyDescription', e.target.value)}
-              placeholder="스토리의 배경과 설명을 작성하세요..."
+              placeholder={t('storyDescription') + '...'}
               rows={3}
             />
           </div>
 
           <div className="form-group">
-            <label>스탯 이름 설정</label>
-            <div className="stat-names-grid">
-              {Object.entries(config.statNames).map(([statKey, name]) => {
-                const statIcons = {
-                  health: '❤️',
-                  wealth: '💰',
-                  happiness: '😊',
-                  power: '👑'
-                };
-                return (
-                  <div key={statKey} className="stat-name-item">
-                    <label>{statIcons[statKey]} {statKey}</label>
-                    <input
-                      type="text"
-                      value={name}
-                      onChange={(e) => handleStatNameChange(statKey, e.target.value)}
-                      className="stat-name-input"
-                      placeholder={`${statKey} 이름`}
-                    />
+            <label>{t('statNamesAndIcons')}</label>
+            <div className="stat-config-grid">
+              {Object.entries(config.statNames).map(([statKey, name], index) => (
+                <div key={statKey} className="stat-config-item">
+                  <div className="stat-header">
+                    <span className="stat-label">{t('stat')} {index + 1}</span>
                   </div>
-                );
-              })}
+                  <div className="stat-config-row">
+                    <div className="icon-selector">
+                      <label>{t('icon')}</label>
+                      <select
+                        value={config.statIcons[statKey]}
+                        onChange={(e) => handleStatIconChange(statKey, e.target.value)}
+                        className="icon-select"
+                      >
+                        {availableIcons.map(icon => (
+                          <option key={icon} value={icon}>{icon}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="name-input">
+                      <label>{t('name')}</label>
+                      <input
+                        type="text"
+                        value={name}
+                        onChange={(e) => handleStatNameChange(statKey, e.target.value)}
+                        className="stat-name-input"
+                        placeholder={t('stat') + ' ' + t('name')}
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
           <div className="form-group">
-            <label>초기 스탯 설정</label>
+            <label>{t('initialStats')}</label>
             <div className="initial-stats-grid">
-              {Object.entries(config.initialStats).map(([statKey, value]) => {
-                const statIcons = {
-                  health: '❤️',
-                  wealth: '💰',
-                  happiness: '😊',
-                  power: '👑'
-                };
-                return (
-                  <div key={statKey} className="initial-stat-item">
-                    <label>{statIcons[statKey]} {config.statNames[statKey]}</label>
-                    <input
-                      type="number"
-                      min="0"
-                      max="100"
-                      value={value}
-                      onChange={(e) => handleInitialStatChange(statKey, e.target.value)}
-                      className="initial-stat-input"
-                    />
-                  </div>
-                );
-              })}
+              {Object.entries(config.initialStats).map(([statKey, value]) => (
+                <div key={statKey} className="initial-stat-item">
+                  <label>{config.statIcons[statKey]} {config.statNames[statKey]}</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={value}
+                    onChange={(e) => handleInitialStatChange(statKey, e.target.value)}
+                    className="initial-stat-input"
+                  />
+                </div>
+              ))}
             </div>
             <div className="stat-help">
-              <small>0 ~ 100 범위로 설정 (게임 시작 시 초기값)</small>
+              <small>{t('rangeGuide')}</small>
             </div>
           </div>
 
           <div className="config-help">
-            <h4>💡 설정 가이드</h4>
+            <h4>💡 {t('configGuide')}</h4>
             <ul>
-              <li><strong>스토리 제목:</strong> 게임의 메인 타이틀</li>
-              <li><strong>스토리 설명:</strong> 게임의 배경과 설정</li>
-              <li><strong>스탯 이름:</strong> 게임에서 사용할 스탯의 이름 (예: 체력 → 마나)</li>
-              <li><strong>초기 스탯:</strong> 게임 시작 시 각 스탯의 초기값</li>
+              <li><strong>{t('storyTitle')}:</strong> {t('configGuideItems.storyTitle')}</li>
+              <li><strong>{t('storyDescription')}:</strong> {t('configGuideItems.storyDescription')}</li>
+              <li><strong>{t('icon')}:</strong> {t('configGuideItems.statIcon')}</li>
+              <li><strong>{t('name')}:</strong> {t('configGuideItems.statName')}</li>
+              <li><strong>{t('initialStats')}:</strong> {t('configGuideItems.initialStat')}</li>
             </ul>
           </div>
         </div>
 
         <div className="config-actions">
           <button className="cancel-button" onClick={onClose}>
-            취소
+            {t('cancel')}
           </button>
           <button className="save-button" onClick={handleSave}>
-            저장
+            {t('save')}
           </button>
         </div>
       </div>

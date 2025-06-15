@@ -1,0 +1,95 @@
+.language-selector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.language-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  white-space: nowrap;
+}
+
+.language-dropdown {
+  padding: 6px 12px;
+  border: 2px solid #e1e5e9;
+  border-radius: 6px;
+  font-size: 14px;
+  background: white;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  min-width: 120px;
+}
+
+.language-dropdown:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.language-dropdown:hover {
+  border-color: #667eea;
+}
+
+/* 게임 모드에서의 언어 선택기 (상단 우측) */
+.language-selector.game-mode {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 8px 12px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(5px);
+}
+
+.language-selector.game-mode .language-label {
+  color: #333;
+}
+
+.language-selector.game-mode .language-dropdown {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+/* 에디터 모드에서의 언어 선택기 (툴바 내) */
+.language-selector.editor-mode {
+  margin-left: auto;
+  background: transparent;
+}
+
+.language-selector.editor-mode .language-label {
+  color: #555;
+  font-size: 13px;
+}
+
+.language-selector.editor-mode .language-dropdown {
+  font-size: 13px;
+  padding: 4px 8px;
+  min-width: 100px;
+}
+
+/* 모바일 대응 */
+@media (max-width: 768px) {
+  .language-selector {
+    gap: 6px;
+  }
+  
+  .language-label {
+    font-size: 12px;
+  }
+  
+  .language-dropdown {
+    font-size: 12px;
+    padding: 4px 8px;
+    min-width: 100px;
+  }
+  
+  .language-selector.game-mode {
+    top: 10px;
+    right: 10px;
+    padding: 6px 8px;
+  }
+} 
