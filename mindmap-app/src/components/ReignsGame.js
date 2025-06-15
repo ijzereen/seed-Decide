@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import './ReignsGame.css';
 import useTranslation from '../hooks/useTranslation';
 
@@ -33,6 +33,13 @@ const ReignsGame = ({ nodes, edges, onBackToEditor, gameConfig }) => {
       }
     }
   }, [nodes, edges, currentNodeId]);
+
+  // gameConfig가 변경될 때 초기 스탯 업데이트
+  useEffect(() => {
+    if (gameConfig?.initialStats) {
+      setGameStats(gameConfig.initialStats);
+    }
+  }, [gameConfig?.initialStats]);
 
   // 현재 노드 정보 가져오기
   const getCurrentNode = useCallback(() => {
@@ -193,19 +200,23 @@ const ReignsGame = ({ nodes, edges, onBackToEditor, gameConfig }) => {
 
   const currentNode = getCurrentNode();
   const choices = getChoices();
-  const statNames = gameConfig?.statNames || {
-    health: t('stat') + ' 1',
-    wealth: t('stat') + ' 2', 
-    happiness: t('stat') + ' 3',
-    power: t('stat') + ' 4'
-  };
+  const statNames = useMemo(() => {
+    return gameConfig?.statNames || {
+      health: t('stat') + ' 1',
+      wealth: t('stat') + ' 2', 
+      happiness: t('stat') + ' 3',
+      power: t('stat') + ' 4'
+    };
+  }, [gameConfig?.statNames, t]);
   
-  const statIcons = gameConfig?.statIcons || {
-    health: '❤️',
-    wealth: '💰',
-    happiness: '😊',
-    power: '👑'
-  };
+  const statIcons = useMemo(() => {
+    return gameConfig?.statIcons || {
+      health: '❤️',
+      wealth: '💰',
+      happiness: '😊',
+      power: '👑'
+    };
+  }, [gameConfig?.statIcons]);
 
   if (!currentNode) {
     return (

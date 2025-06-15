@@ -12,55 +12,30 @@ const GameConfig = ({ gameConfig, onSave, onClose }) => {
     '📚', '🔧', '🎵', '🌙', '☀️', '🌈', '🎃', '🎄', '🎁', '🎂'
   ];
 
-  const [config, setConfig] = useState({
-    storyTitle: '',
-    storyDescription: '',
-    statNames: {
+  const [config, setConfig] = useState(() => ({
+    storyTitle: gameConfig?.storyTitle || '',
+    storyDescription: gameConfig?.storyDescription || '',
+    statNames: gameConfig?.statNames || {
       health: t('stat') + ' 1',
       wealth: t('stat') + ' 2',
       happiness: t('stat') + ' 3',
       power: t('stat') + ' 4'
     },
-    statIcons: {
+    statIcons: gameConfig?.statIcons || {
       health: '❤️',
       wealth: '💰',
       happiness: '😊',
       power: '👑'
     },
-    initialStats: {
+    initialStats: gameConfig?.initialStats || {
       health: 50,
       wealth: 50,
       happiness: 50,
       power: 50
     }
-  });
+  }));
 
-  useEffect(() => {
-    if (gameConfig) {
-      setConfig({
-        storyTitle: gameConfig.storyTitle || '',
-        storyDescription: gameConfig.storyDescription || '',
-        statNames: gameConfig.statNames || {
-          health: t('stat') + ' 1',
-          wealth: t('stat') + ' 2',
-          happiness: t('stat') + ' 3',
-          power: t('stat') + ' 4'
-        },
-        statIcons: gameConfig.statIcons || {
-          health: '❤️',
-          wealth: '💰',
-          happiness: '😊',
-          power: '👑'
-        },
-        initialStats: gameConfig.initialStats || {
-          health: 50,
-          wealth: 50,
-          happiness: 50,
-          power: 50
-        }
-      });
-    }
-  }, [gameConfig, t]);
+
 
   const handleSave = () => {
     onSave(config);
