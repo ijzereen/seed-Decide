@@ -307,7 +307,7 @@ function MindMapFlow() {
         gameConfig: gameConfig
       };
 
-      const { saveGame } = await import('../utils/api');
+      const { saveGame } = await import('./utils/api');
       const result = await saveGame(gameData);
       const fullShareUrl = `${window.location.origin}/game/${result.gameId}`;
       setShareUrl(fullShareUrl);
@@ -440,7 +440,7 @@ function MindMapFlow() {
         provider: 'claude' // 기본값으로 Claude 사용
       };
 
-      const { generateStory } = await import('../utils/api');
+      const { generateStory } = await import('./utils/api');
       const result = await generateStory(storyRequest);
       
       // 생성된 스토리로 노드 업데이트
