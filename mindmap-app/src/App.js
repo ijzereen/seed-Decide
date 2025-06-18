@@ -1,5 +1,4 @@
 import React, { useCallback, useState, useRef, useEffect } from 'react';
-import { Routes, Route } from 'react-router-dom';
 import ReactFlow, {
   MiniMap,
   Controls,
@@ -10,7 +9,6 @@ import ReactFlow, {
   useReactFlow,
   ReactFlowProvider,
 } from 'reactflow';
-import LZString from 'lz-string';
 
 import 'reactflow/dist/style.css';
 import './App.css';
@@ -20,7 +18,6 @@ import NodeEditor from './components/NodeEditor';
 import GameConfig from './components/GameConfig';
 import StoryEditor from './components/StoryEditor';
 import LanguageSelector from './components/LanguageSelector';
-import SharedGame from './components/SharedGame';
 import { createSampleStory, createFantasyAdventureStory } from './components/SampleStories';
 import useTranslation from './hooks/useTranslation';
 
@@ -282,68 +279,7 @@ function MindMapFlow() {
     event.target.value = '';
   }, [setNodes, setEdges, t]);
 
-  // 게임 공유 기능 (환경에 따라 다른 방식 사용)
-  const shareGame = useCallback(async () => {
-    if (nodes.length === 0) {
-      alert(t('noNodesMessage'));
-      return;
-    }
 
-    try {
-      const gameData = {
-        nodes,
-        edges,
-        gameConfig
-      };
-
-      // 개발 환경인지 확인
-      const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-
-      if (isDevelopment) {
-        // 로컬 개발 환경: LZ-String 압축 방식 사용
-        const compressed = LZString.compressToEncodedURIComponent(JSON.stringify(gameData));
-        const shareUrl = `${window.location.origin}/play/${compressed}`;
-        
-        // 클립보드에 복사
-        navigator.clipboard.writeText(shareUrl).then(() => {
-          alert(`🎮 게임 공유 링크가 클립보드에 복사되었습니다! (개발 모드)\n\n${shareUrl}\n\n이 링크를 다른 사람에게 보내면 바로 게임을 플레이할 수 있습니다.\n⚠️ 개발용 링크는 매우 길 수 있습니다.`);
-        }).catch(() => {
-          prompt('게임 공유 링크를 복사하세요:', shareUrl);
-        });
-      } else {
-        // 프로덕션 환경: 서버리스 API 사용
-        const response = await fetch('/api/save-game', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(gameData)
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const result = await response.json();
-        
-        if (result.success) {
-          const shareUrl = `${window.location.origin}/play/${result.gameId}`;
-          
-          // 클립보드에 복사
-          navigator.clipboard.writeText(shareUrl).then(() => {
-            alert(`🎮 게임 공유 링크가 클립보드에 복사되었습니다!\n\n${shareUrl}\n\n이 링크를 다른 사람에게 보내면 바로 게임을 플레이할 수 있습니다.\n📊 데이터 크기: ${result.dataSize}자`);
-          }).catch(() => {
-            prompt('게임 공유 링크를 복사하세요:', shareUrl);
-          });
-        } else {
-          throw new Error('게임 저장 실패');
-        }
-      }
-    } catch (error) {
-      console.error('게임 공유 실패:', error);
-      alert('게임 공유에 실패했습니다. 다시 시도해주세요.');
-    }
-  }, [nodes, edges, gameConfig, t]);
 
 
   // 노드나 엣지가 변경될 때마다 시작 노드 스타일 업데이트
@@ -544,13 +480,6 @@ function MindMapFlow() {
               style={{ display: 'none' }}
             />
           </label>
-          <button 
-            className="toolbar-button share" 
-            onClick={shareGame}
-            disabled={nodes.length === 0}
-          >
-            🔗 {t('shareGame')}
-          </button>
         </div>
         <div className="toolbar-center">
           <button className="toolbar-button secondary" onClick={loadSampleStory}>
@@ -628,17 +557,9 @@ function MindMapFlow() {
 
 function App() {
   return (
-    <Routes>
-      <Route 
-        path="/" 
-        element={
-          <ReactFlowProvider>
-            <MindMapFlow />
-          </ReactFlowProvider>
-        } 
-      />
-      <Route path="/play/:data" element={<SharedGame />} />
-    </Routes>
+    <ReactFlowProvider>
+      <MindMapFlow />
+    </ReactFlowProvider>
   );
 }
 

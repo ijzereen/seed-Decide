@@ -12,7 +12,7 @@ const translations = {
     save: '저장하기',
     export: '내보내기',
     import: '가져오기',
-    shareGame: '게임 공유',
+  
     startGame: '게임 시작',
     backToEditor: '에디터로 돌아가기',
     newStory: '새 스토리',
@@ -169,7 +169,7 @@ const translations = {
     save: '保存',
     export: 'エクスポート',
     import: 'インポート',
-    shareGame: 'ゲーム共有',
+
     startGame: 'ゲーム開始',
     backToEditor: 'エディターに戻る',
     newStory: '新しいストーリー',
@@ -326,7 +326,7 @@ const translations = {
     save: 'Save',
     export: 'Export',
     import: 'Import',
-    shareGame: 'Share Game',
+
     startGame: 'Start Game',
     backToEditor: 'Back to Editor',
     newStory: 'New Story',
