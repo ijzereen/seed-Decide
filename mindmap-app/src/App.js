@@ -418,7 +418,7 @@ function MindMapFlow() {
       console.error('스토리 생성 실패:', error);
       alert(t('storyGenerationFailed'));
     }
-  }, [setNodes, editingNode]);
+  }, [setNodes, editingNode, t]);
 
   // 게임 모드일 때 게임 컴포넌트 렌더링
   if (gameMode) {
