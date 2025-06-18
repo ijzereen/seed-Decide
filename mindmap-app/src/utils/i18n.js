@@ -46,7 +46,7 @@ const translations = {
     restart: '다시 시작',
     leftChoice: '왼쪽 선택지',
     rightChoice: '오른쪽 선택지',
-    keyboardHint: '키보드: ← 왼쪽 선택지 | → 오른쪽 선택지',
+    keyboardHint: '키보드: 왼쪽 선택지 | 오른쪽 선택지',
     
     // 스토리 에디터
     storyGeneration: '스토리 생성',
@@ -183,7 +183,7 @@ const translations = {
     restart: '再開',
     leftChoice: '左の選択肢',
     rightChoice: '右の選択肢',
-    keyboardHint: 'キーボード: ← 左の選択肢 | → 右の選択肢',
+    keyboardHint: 'キーボード: 左の選択肢 | 右の選択肢',
     
     // ストーリーエディター
     storyGeneration: 'ストーリー生成',
@@ -320,7 +320,7 @@ const translations = {
     restart: 'Restart',
     leftChoice: 'Left Choice',
     rightChoice: 'Right Choice',
-    keyboardHint: 'Keyboard: ← Left Choice | → Right Choice',
+    keyboardHint: 'Keyboard: Left Choice | Right Choice',
     
     // Story editor
     storyGeneration: 'Story Generation',

@@ -486,11 +486,7 @@
   right: -160px;
 }
 
-.hint-arrow {
-  font-size: 16px;
-  font-weight: bold;
-  color: #f39c12;
-}
+
 
 .hint-text {
   flex: 1;
@@ -651,17 +647,7 @@
   position: relative;
 }
 
-.choice-button-mobile.left-choice::before {
-  content: '←';
-  position: absolute;
-  left: 8px;
-  font-size: 18px;
-  font-weight: bold;
-  opacity: 0.8;
-  color: #d4af37;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-  transition: all 0.3s ease;
-}
+
 
 .choice-button-mobile.right-choice {
   background: linear-gradient(135deg, #8b4513 0%, #a0522d 50%, #654321 100%);
@@ -672,18 +658,6 @@
     inset 0 2px 0 rgba(212, 175, 55, 0.3),
     inset 0 -1px 0 rgba(0, 0, 0, 0.2);
   position: relative;
-}
-
-.choice-button-mobile.right-choice::before {
-  content: '→';
-  position: absolute;
-  right: 8px;
-  font-size: 18px;
-  font-weight: bold;
-  opacity: 0.8;
-  color: #d4af37;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-  transition: all 0.3s ease;
 }
 
 .choice-button-mobile:hover {
@@ -702,10 +676,7 @@
     inset 0 -1px 0 rgba(0, 0, 0, 0.3);
 }
 
-.choice-button-mobile.left-choice:hover::before {
-  opacity: 1;
-  transform: translateX(-2px);
-}
+
 
 .choice-button-mobile.right-choice:hover {
   box-shadow: 
@@ -715,10 +686,7 @@
     inset 0 -1px 0 rgba(0, 0, 0, 0.3);
 }
 
-.choice-button-mobile.right-choice:hover::before {
-  opacity: 1;
-  transform: translateX(2px);
-}
+
 
 .choice-button-mobile:active {
   transform: translateY(-2px) scale(0.98);

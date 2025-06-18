@@ -344,14 +344,12 @@ const ReignsGame = ({ nodes, edges, onBackToEditor, gameConfig }) => {
           <div className="swipe-hints-container">
             {choices[0] && (
               <div className={`choice-hint-side left ${selectedChoice?.id === choices[0].id || keyboardSelection?.id === choices[0].id ? 'active' : ''}`}>
-                <div className="hint-arrow">←</div>
                 <div className="hint-text">{choices[0].data.choice || choices[0].data.label}</div>
               </div>
             )}
             {choices[1] && (
               <div className={`choice-hint-side right ${selectedChoice?.id === choices[1].id || keyboardSelection?.id === choices[1].id ? 'active' : ''}`}>
                 <div className="hint-text">{choices[1].data.choice || choices[1].data.label}</div>
-                <div className="hint-arrow">→</div>
               </div>
             )}
           </div>
@@ -361,7 +359,7 @@ const ReignsGame = ({ nodes, edges, onBackToEditor, gameConfig }) => {
         {isDragging && (
           <div className="drag-indicator">
             <div className={`drag-direction ${cardOffset.x > 50 ? 'right' : cardOffset.x < -50 ? 'left' : 'center'}`}>
-              {cardOffset.x > 50 ? t('rightChoice') + ' →' : cardOffset.x < -50 ? '← ' + t('leftChoice') : t('choice')}
+              {cardOffset.x > 50 ? t('rightChoice') : cardOffset.x < -50 ? t('leftChoice') : t('choice')}
             </div>
           </div>
         )}
@@ -376,7 +374,7 @@ const ReignsGame = ({ nodes, edges, onBackToEditor, gameConfig }) => {
               className="choice-button-mobile left-choice"
               onClick={() => handleChoice(choices[0])}
             >
-              ← {t('leftChoice')}: {choices[0].data.choice || choices[0].data.label}
+              {t('leftChoice')}: {choices[0].data.choice || choices[0].data.label}
             </button>
           )}
           {choices[1] && (
@@ -385,7 +383,7 @@ const ReignsGame = ({ nodes, edges, onBackToEditor, gameConfig }) => {
               className="choice-button-mobile right-choice"
               onClick={() => handleChoice(choices[1])}
             >
-              {t('rightChoice')}: {choices[1].data.choice || choices[1].data.label} →
+              {t('rightChoice')}: {choices[1].data.choice || choices[1].data.label}
             </button>
           )}
         </div>
@@ -401,7 +399,7 @@ const ReignsGame = ({ nodes, edges, onBackToEditor, gameConfig }) => {
       {/* 하단 컨트롤 */}
       <div className="controls-mobile">
         <button onClick={handleBackToEditor} className="control-button">
-          ← {t('backToEditor').split(' ')[0]}
+          {t('backToEditor').split(' ')[0]}
         </button>
         <button onClick={restartGame} className="control-button">
           🔄 {t('restart')}
