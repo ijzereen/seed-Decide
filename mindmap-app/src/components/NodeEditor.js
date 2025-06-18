@@ -36,8 +36,7 @@ const NodeEditor = ({ node, nodes, edges, gameConfig, onSave, onClose, onGenerat
       });
       
       if (node.data.imageUrl) {
-        const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000';
-        setImagePreview(`${backendUrl}${node.data.imageUrl}`);
+        setImagePreview(node.data.imageUrl); // Base64 데이터 직접 사용
       } else {
         setImagePreview(null);
       }
@@ -140,7 +139,7 @@ const NodeEditor = ({ node, nodes, edges, gameConfig, onSave, onClose, onGenerat
       return;
     }
 
-    const maxSize = 5 * 1024 * 1024;
+    const maxSize = 2 * 1024 * 1024; // 2MB로 제한 (Base64로 저장하므로)
     if (file.size > maxSize) {
       alert(t('fileSizeLimit'));
       return;
@@ -149,79 +148,49 @@ const NodeEditor = ({ node, nodes, edges, gameConfig, onSave, onClose, onGenerat
     setIsUploadingImage(true);
     
     try {
-      const formData = new FormData();
-      formData.append('file', file);
+      // FileReader를 사용해 Base64로 변환
+      const reader = new FileReader();
       
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000';
-      const uploadUrl = `${backendUrl}/api/upload-image`;
+      reader.onload = (e) => {
+        const base64Data = e.target.result;
+        
+        // 노드 데이터에 Base64 이미지 저장
+        setNodeData(prev => ({
+          ...prev,
+          imageUrl: base64Data // Base64 데이터 직접 저장
+        }));
+        
+        setImagePreview(base64Data);
+        setIsUploadingImage(false);
+        alert(t('imageUploadSuccess'));
+      };
       
-      console.log('Upload URL:', uploadUrl);
-      console.log('Upload request started');
+      reader.onerror = () => {
+        console.error('File reading failed');
+        alert(t('imageUploadError'));
+        setIsUploadingImage(false);
+      };
       
-      const response = await fetch(uploadUrl, {
-        method: 'POST',
-        body: formData,
-      });
-      
-      console.log('Response status:', response.status, response.statusText);
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Server response error:', errorText);
-        throw new Error(`Server error (${response.status}): ${errorText}`);
-      }
-      
-      const result = await response.json();
-      console.log('Upload successful:', result);
-      
-      setNodeData(prev => ({
-        ...prev,
-        imageUrl: result.imageUrl
-      }));
-      
-      setImagePreview(`${backendUrl}${result.imageUrl}`);
-      
-      alert(t('imageUploadSuccess'));
+      // Base64로 읽기 시작
+      reader.readAsDataURL(file);
       
     } catch (error) {
       console.error('Image upload failed:', error);
-      
-      if (error.message.includes('fetch')) {
-        alert(t('serverConnectionError'));
-      } else {
-        alert(t('imageUploadError') + `: ${error.message}`);
-      }
-    } finally {
+      alert(t('imageUploadError') + `: ${error.message}`);
       setIsUploadingImage(false);
     }
   };
 
-  const handleImageRemove = async () => {
+  const handleImageRemove = () => {
     if (!nodeData.imageUrl) return;
     
-    try {
-      const filename = nodeData.imageUrl.split('/').pop();
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000';
-      
-      await fetch(`${backendUrl}/api/delete-image/${filename}`, {
-        method: 'DELETE',
-      });
-      
-      setNodeData(prev => ({
-        ...prev,
-        imageUrl: ''
-      }));
-      
-      setImagePreview(null);
-      
-    } catch (error) {
-      console.error('Image deletion failed:', error);
-      setNodeData(prev => ({
-        ...prev,
-        imageUrl: ''
-      }));
-      setImagePreview(null);
-    }
+    // 로컬 저장이므로 단순히 데이터에서 제거
+    setNodeData(prev => ({
+      ...prev,
+      imageUrl: ''
+    }));
+    
+    setImagePreview(null);
   };
 
   if (!node) return null;

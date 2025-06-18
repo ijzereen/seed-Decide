@@ -304,7 +304,7 @@ const ReignsGame = ({ nodes, edges, onBackToEditor, gameConfig }) => {
             {currentNode.data.imageUrl && (
               <div className="story-image-container">
                 <img
-                  src={`${process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000'}${currentNode.data.imageUrl}`}
+                  src={currentNode.data.imageUrl} // Base64 데이터 직접 사용
                   alt="스토리 이미지"
                   className="story-image"
                   onError={(e) => {
