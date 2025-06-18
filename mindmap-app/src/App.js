@@ -1,4 +1,5 @@
 import React, { useCallback, useState, useRef, useEffect } from 'react';
+import { Routes, Route } from 'react-router-dom';
 import ReactFlow, {
   MiniMap,
   Controls,
@@ -9,6 +10,7 @@ import ReactFlow, {
   useReactFlow,
   ReactFlowProvider,
 } from 'reactflow';
+import LZString from 'lz-string';
 
 import 'reactflow/dist/style.css';
 import './App.css';
@@ -18,6 +20,7 @@ import NodeEditor from './components/NodeEditor';
 import GameConfig from './components/GameConfig';
 import StoryEditor from './components/StoryEditor';
 import LanguageSelector from './components/LanguageSelector';
+import SharedGame from './components/SharedGame';
 import { createSampleStory, createFantasyAdventureStory } from './components/SampleStories';
 import useTranslation from './hooks/useTranslation';
 
@@ -279,6 +282,36 @@ function MindMapFlow() {
     event.target.value = '';
   }, [setNodes, setEdges, t]);
 
+  // 게임 공유 기능
+  const shareGame = useCallback(() => {
+    if (nodes.length === 0) {
+      alert(t('noNodesMessage'));
+      return;
+    }
+
+    try {
+      const gameData = {
+        nodes,
+        edges,
+        gameConfig
+      };
+      
+      const compressed = LZString.compressToEncodedURIComponent(JSON.stringify(gameData));
+      const shareUrl = `${window.location.origin}/play/${compressed}`;
+      
+      // 클립보드에 복사
+      navigator.clipboard.writeText(shareUrl).then(() => {
+        alert('🎮 게임 공유 링크가 클립보드에 복사되었습니다!\n\n이 링크를 다른 사람에게 보내면 바로 게임을 플레이할 수 있습니다.');
+      }).catch(() => {
+        // 클립보드 복사 실패 시 프롬프트로 표시
+        prompt('게임 공유 링크를 복사하세요:', shareUrl);
+      });
+    } catch (error) {
+      console.error('게임 공유 실패:', error);
+      alert('게임 공유에 실패했습니다.');
+    }
+  }, [nodes, edges, gameConfig, t]);
+
 
   // 노드나 엣지가 변경될 때마다 시작 노드 스타일 업데이트
   useEffect(() => {
@@ -478,6 +511,13 @@ function MindMapFlow() {
               style={{ display: 'none' }}
             />
           </label>
+          <button 
+            className="toolbar-button share" 
+            onClick={shareGame}
+            disabled={nodes.length === 0}
+          >
+            🔗 {t('shareGame')}
+          </button>
         </div>
         <div className="toolbar-center">
           <button className="toolbar-button secondary" onClick={loadSampleStory}>
@@ -555,9 +595,17 @@ function MindMapFlow() {
 
 function App() {
   return (
-    <ReactFlowProvider>
-      <MindMapFlow />
-    </ReactFlowProvider>
+    <Routes>
+      <Route 
+        path="/" 
+        element={
+          <ReactFlowProvider>
+            <MindMapFlow />
+          </ReactFlowProvider>
+        } 
+      />
+      <Route path="/play/:data" element={<SharedGame />} />
+    </Routes>
   );
 }
 
