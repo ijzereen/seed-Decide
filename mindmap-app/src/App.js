@@ -1,4 +1,5 @@
 import React, { useCallback, useState, useRef, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import ReactFlow, {
   MiniMap,
   Controls,
@@ -18,6 +19,8 @@ import NodeEditor from './components/NodeEditor';
 import GameConfig from './components/GameConfig';
 import StoryEditor from './components/StoryEditor';
 import LanguageSelector from './components/LanguageSelector';
+import SharedGame from './components/SharedGame';
+import ShareModal from './components/ShareModal';
 import { createSampleStory, createFantasyAdventureStory } from './components/SampleStories';
 import useTranslation from './hooks/useTranslation';
 
@@ -77,6 +80,8 @@ function MindMapFlow() {
   const [editingNode, setEditingNode] = useState(null);
   const [showGameConfig, setShowGameConfig] = useState(false);
   const [showStoryEditor, setShowStoryEditor] = useState(false);
+  const [shareUrl, setShareUrl] = useState('');
+  const [showShareModal, setShowShareModal] = useState(false);
   const [gameConfig, setGameConfig] = useState(savedData.gameConfig || {
     storyTitle: t('appTitle'),
     storyDescription: t('appTitle'),
@@ -279,6 +284,72 @@ function MindMapFlow() {
     event.target.value = '';
   }, [setNodes, setEdges, t]);
 
+  // 게임 공유 기능
+  const handleShareGame = useCallback(async () => {
+    if (nodes.length === 0) {
+      alert(t('noNodesToShare') || '공유할 게임이 없습니다. 먼저 노드를 생성해주세요.');
+      return;
+    }
+
+    try {
+      const gameData = {
+        title: gameConfig.storyTitle || t('appTitle') || '제목 없는 게임',
+        description: gameConfig.storyDescription || '',
+        nodes: nodes.map(node => ({
+          id: node.id,
+          label: node.data.label,
+          story: node.data.story,
+          choice: node.data.choice,
+          statChanges: node.data.statChanges,
+          imageUrl: node.data.imageUrl
+        })),
+        edges: edges,
+        gameConfig: gameConfig
+      };
+
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000';
+      const response = await fetch(`${backendUrl}/api/games`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(gameData)
+      });
+
+      if (!response.ok) {
+        throw new Error('게임 저장에 실패했습니다.');
+      }
+
+      const result = await response.json();
+      const fullShareUrl = `${window.location.origin}/game/${result.gameId}`;
+      setShareUrl(fullShareUrl);
+      setShowShareModal(true);
+      
+      console.log('게임 공유 성공:', result.gameId);
+    } catch (error) {
+      console.error('게임 공유 오류:', error);
+      alert(t('shareGameError') || '게임 공유에 실패했습니다: ' + error.message);
+    }
+  }, [nodes, edges, gameConfig, t]);
+
+  // 클립보드 복사 기능
+  const copyToClipboard = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      alert(t('linkCopied') || '링크가 클립보드에 복사되었습니다!');
+    } catch (err) {
+      console.error('클립보드 복사 실패:', err);
+      // 폴백: 텍스트 선택
+      const textArea = document.createElement('textarea');
+      textArea.value = shareUrl;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      alert(t('linkCopied') || '링크가 복사되었습니다!');
+    }
+  }, [shareUrl, t]);
+
 
 
 
@@ -461,6 +532,13 @@ function MindMapFlow() {
           </button>
           <button 
             className="toolbar-button" 
+            onClick={handleShareGame}
+            disabled={nodes.length === 0}
+          >
+            🔗 {t('shareGame') || '게임 공유'}
+          </button>
+          <button 
+            className="toolbar-button" 
             onClick={saveData}
           >
             💾 {t('save')}
@@ -551,15 +629,31 @@ function MindMapFlow() {
           onClose={() => setShowStoryEditor(false)}
         />
       )}
+
+      {/* 공유 모달 */}
+      {showShareModal && (
+        <ShareModal
+          shareUrl={shareUrl}
+          onClose={() => setShowShareModal(false)}
+          onCopy={copyToClipboard}
+        />
+      )}
     </div>
   );
 }
 
 function App() {
   return (
-    <ReactFlowProvider>
-      <MindMapFlow />
-    </ReactFlowProvider>
+    <Router>
+      <Routes>
+        <Route path="/" element={
+          <ReactFlowProvider>
+            <MindMapFlow />
+          </ReactFlowProvider>
+        } />
+        <Route path="/game/:gameId" element={<SharedGame />} />
+      </Routes>
+    </Router>
   );
 }
 

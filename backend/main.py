@@ -18,6 +18,11 @@ app = FastAPI(title="Story Generator API", version="1.0.0")
 UPLOAD_DIR = Path("uploads")
 UPLOAD_DIR.mkdir(exist_ok=True)
 
+# 게임 저장 디렉토리 생성
+# 프로덕션에서는 /tmp나 환경변수로 지정된 경로 사용
+GAMES_DIR = Path(os.getenv("GAMES_STORAGE_PATH", "saved_games"))
+GAMES_DIR.mkdir(exist_ok=True, parents=True)
+
 # 정적 파일 서빙 설정
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
@@ -32,8 +37,8 @@ app.add_middleware(
         "https://*.amazonaws.com",   # AWS 서비스 도메인
         "https://*.elasticbeanstalk.com",  # Elastic Beanstalk 도메인
         "http://*.elasticbeanstalk.com",   # Elastic Beanstalk HTTP
-        "*"  # 개발 중에는 모든 origin 허용 (운영에서는 제거)
-    ],
+        "https://*.railway.app",  # Railway 배포 도메인
+    ] if os.getenv("DEBUG", "True").lower() == "false" else ["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -67,6 +72,16 @@ class StoryGenerationResponse(BaseModel):
     generatedStory: str
     suggestions: Optional[Dict[str, Any]] = None
     metadata: Optional[Dict[str, Any]] = None
+
+class GameData(BaseModel):
+    id: Optional[str] = None
+    title: str
+    description: Optional[str] = None
+    nodes: List[NodeData]
+    edges: List[Dict[str, Any]]
+    gameConfig: GameConfig
+    createdAt: Optional[str] = None
+    updatedAt: Optional[str] = None
 
 # API 키 설정 (환경변수에서 가져오기)
 CLAUDE_API_KEY = os.getenv("CLAUDE_API_KEY")
@@ -418,6 +433,300 @@ async def delete_image(filename: str):
     except Exception as e:
         print(f"이미지 삭제 오류: {str(e)}")
         raise HTTPException(status_code=500, detail=f"이미지 삭제 중 오류가 발생했습니다: {str(e)}")
+
+# 게임 저장 API
+@app.post("/api/games", response_model=Dict[str, str])
+async def save_game(game_data: GameData):
+    """게임 데이터를 JSON 파일로 저장하고 공유 가능한 ID를 반환"""
+    try:
+        # 8자리 게임 ID 생성
+        game_id = str(uuid.uuid4())[:8]
+        game_file = GAMES_DIR / f"{game_id}.json"
+        
+        # 게임 데이터 준비
+        game_dict = {
+            "id": game_id,
+            "title": game_data.title,
+            "description": game_data.description,
+            "nodes": [node.dict() for node in game_data.nodes],
+            "edges": game_data.edges,
+            "gameConfig": game_data.gameConfig.dict(),
+            "createdAt": datetime.now().isoformat(),
+            "updatedAt": datetime.now().isoformat()
+        }
+        
+        # JSON 파일로 저장
+        with open(game_file, 'w', encoding='utf-8') as f:
+            json.dump(game_dict, f, ensure_ascii=False, indent=2)
+        
+        print(f"게임 저장 성공: {game_id}")
+        return {"gameId": game_id, "shareUrl": f"/game/{game_id}"}
+        
+    except Exception as e:
+        print(f"게임 저장 오류: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"게임 저장 중 오류가 발생했습니다: {str(e)}")
+
+# 게임 조회 API
+@app.get("/api/games/{game_id}")
+async def get_game(game_id: str):
+    """게임 ID로 게임 데이터 조회"""
+    try:
+        game_file = GAMES_DIR / f"{game_id}.json"
+        
+        if not game_file.exists():
+            print(f"게임을 찾을 수 없음: {game_id}")
+            raise HTTPException(status_code=404, detail="게임을 찾을 수 없습니다.")
+        
+        with open(game_file, 'r', encoding='utf-8') as f:
+            game_data = json.load(f)
+        
+        print(f"게임 조회 성공: {game_id}")
+        return game_data
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"게임 조회 오류: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"게임 조회 중 오류가 발생했습니다: {str(e)}")
+
+# 게임 목록 조회 API (옵션)
+@app.get("/api/games")
+async def list_games():
+    """저장된 게임 목록 조회"""
+    try:
+        games = []
+        for game_file in GAMES_DIR.glob("*.json"):
+            try:
+                with open(game_file, 'r', encoding='utf-8') as f:
+                    game_data = json.load(f)
+                
+                # 요약 정보만 포함
+                games.append({
+                    "id": game_data.get("id"),
+                    "title": game_data.get("title"),
+                    "description": game_data.get("description"),
+                    "createdAt": game_data.get("createdAt"),
+                    "nodeCount": len(game_data.get("nodes", [])),
+                    "edgeCount": len(game_data.get("edges", []))
+                })
+            except Exception as e:
+                print(f"게임 파일 읽기 오류: {game_file.name}, {str(e)}")
+                continue
+        
+        # 생성일시 기준 내림차순 정렬
+        games.sort(key=lambda x: x.get("createdAt", ""), reverse=True)
+        
+        return {"games": games, "count": len(games)}
+        
+    except Exception as e:
+        print(f"게임 목록 조회 오류: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"게임 목록 조회 중 오류가 발생했습니다: {str(e)}")
+
+# 스토리지 모니터링 API
+@app.get("/api/storage/health")
+async def storage_health_check():
+    """스토리지 사용량 및 상태 모니터링"""
+    try:
+        import shutil
+        
+        # 게임 파일 통계
+        game_files = list(GAMES_DIR.glob("*.json"))
+        total_games = len(game_files)
+        
+        # 각 게임 파일 크기 계산
+        total_size_bytes = 0
+        largest_file_size = 0
+        smallest_file_size = float('inf')
+        
+        for game_file in game_files:
+            try:
+                size = game_file.stat().st_size
+                total_size_bytes += size
+                largest_file_size = max(largest_file_size, size)
+                smallest_file_size = min(smallest_file_size, size)
+            except:
+                continue
+        
+        # 평균 파일 크기
+        avg_file_size = total_size_bytes / total_games if total_games > 0 else 0
+        
+        # 사람이 읽기 쉬운 크기 변환 함수
+        def format_bytes(bytes_value):
+            for unit in ['B', 'KB', 'MB', 'GB']:
+                if bytes_value < 1024.0:
+                    return f"{bytes_value:.2f} {unit}"
+                bytes_value /= 1024.0
+            return f"{bytes_value:.2f} TB"
+        
+        # 이미지 파일 통계
+        image_files = list(UPLOAD_DIR.glob("*"))
+        total_images = len([f for f in image_files if f.is_file()])
+        total_image_size_bytes = sum(f.stat().st_size for f in image_files if f.is_file())
+        
+        # 디스크 사용량 (가능한 경우)
+        try:
+            disk_usage = shutil.disk_usage(GAMES_DIR.parent)
+            total_disk = disk_usage.total
+            used_disk = disk_usage.used
+            free_disk = disk_usage.free
+            disk_usage_percent = (used_disk / total_disk) * 100
+        except:
+            total_disk = used_disk = free_disk = disk_usage_percent = None
+        
+        # 게임 생성 시간별 통계
+        from datetime import datetime, timedelta
+        
+        now = datetime.now()
+        games_24h = games_7d = games_30d = 0
+        
+        for game_file in game_files:
+            try:
+                with open(game_file, 'r', encoding='utf-8') as f:
+                    game_data = json.load(f)
+                created_at_str = game_data.get('createdAt', '')
+                if created_at_str:
+                    created_at = datetime.fromisoformat(created_at_str.replace('Z', '+00:00'))
+                    
+                    if now - created_at <= timedelta(hours=24):
+                        games_24h += 1
+                    if now - created_at <= timedelta(days=7):
+                        games_7d += 1
+                    if now - created_at <= timedelta(days=30):
+                        games_30d += 1
+            except:
+                continue
+        
+        # 응답 데이터 구성
+        storage_info = {
+            "status": "healthy",
+            "timestamp": datetime.now().isoformat(),
+            "games": {
+                "total_count": total_games,
+                "total_size": format_bytes(total_size_bytes),
+                "total_size_bytes": total_size_bytes,
+                "average_size": format_bytes(avg_file_size),
+                "largest_size": format_bytes(largest_file_size) if total_games > 0 else "0 B",
+                "smallest_size": format_bytes(smallest_file_size) if total_games > 0 and smallest_file_size != float('inf') else "0 B",
+                "recent_activity": {
+                    "last_24h": games_24h,
+                    "last_7d": games_7d,
+                    "last_30d": games_30d
+                }
+            },
+            "images": {
+                "total_count": total_images,
+                "total_size": format_bytes(total_image_size_bytes),
+                "total_size_bytes": total_image_size_bytes
+            },
+            "storage_paths": {
+                "games_directory": str(GAMES_DIR),
+                "images_directory": str(UPLOAD_DIR)
+            }
+        }
+        
+        # 디스크 정보 추가
+        if disk_usage_percent is not None:
+            storage_info["disk"] = {
+                "total": format_bytes(total_disk),
+                "used": format_bytes(used_disk),
+                "free": format_bytes(free_disk),
+                "usage_percent": round(disk_usage_percent, 2)
+            }
+            
+            # 경고 시스템
+            if disk_usage_percent > 90:
+                storage_info["status"] = "warning"
+                storage_info["warnings"] = ["⚠️ 디스크 사용량이 90%를 초과했습니다!"]
+            elif disk_usage_percent > 80:
+                storage_info["status"] = "caution"
+                storage_info["warnings"] = ["⚠️ 디스크 사용량이 80%를 초과했습니다."]
+        
+        # 게임 파일 수 경고
+        if total_games > 1000:
+            if "warnings" not in storage_info:
+                storage_info["warnings"] = []
+            storage_info["warnings"].append(f"📁 게임 파일 수가 {total_games}개로 많습니다. 정리를 고려해보세요.")
+        
+        return storage_info
+        
+    except Exception as e:
+        print(f"스토리지 헬스체크 오류: {str(e)}")
+        return {
+            "status": "error",
+            "timestamp": datetime.now().isoformat(),
+            "error": str(e),
+            "games": {"total_count": 0, "total_size": "0 B"},
+            "images": {"total_count": 0, "total_size": "0 B"}
+        }
+
+# 스토리지 정리 API (관리자용)
+@app.post("/api/storage/cleanup")
+async def cleanup_storage(days_old: int = 30, dry_run: bool = True):
+    """오래된 게임 파일 정리 (기본 30일 이상)"""
+    try:
+        from datetime import datetime, timedelta
+        
+        cutoff_date = datetime.now() - timedelta(days=days_old)
+        files_to_delete = []
+        total_size_to_free = 0
+        
+        for game_file in GAMES_DIR.glob("*.json"):
+            try:
+                with open(game_file, 'r', encoding='utf-8') as f:
+                    game_data = json.load(f)
+                
+                created_at_str = game_data.get('createdAt', '')
+                if created_at_str:
+                    created_at = datetime.fromisoformat(created_at_str.replace('Z', '+00:00'))
+                    
+                    if created_at < cutoff_date:
+                        file_size = game_file.stat().st_size
+                        files_to_delete.append({
+                            "file": game_file.name,
+                            "created_at": created_at.isoformat(),
+                            "size_bytes": file_size,
+                            "title": game_data.get('title', 'Unknown')
+                        })
+                        total_size_to_free += file_size
+                    
+            except Exception as e:
+                print(f"파일 분석 오류: {game_file.name}, {str(e)}")
+                continue
+        
+        # dry_run이 False인 경우에만 실제 삭제
+        deleted_files = []
+        if not dry_run:
+            for file_info in files_to_delete:
+                try:
+                    file_path = GAMES_DIR / file_info["file"]
+                    file_path.unlink()
+                    deleted_files.append(file_info)
+                except Exception as e:
+                    print(f"파일 삭제 오류: {file_info['file']}, {str(e)}")
+                    continue
+        
+        def format_bytes(bytes_value):
+            for unit in ['B', 'KB', 'MB', 'GB']:
+                if bytes_value < 1024.0:
+                    return f"{bytes_value:.2f} {unit}"
+                bytes_value /= 1024.0
+            return f"{bytes_value:.2f} TB"
+        
+        return {
+            "status": "success",
+            "dry_run": dry_run,
+            "cutoff_date": cutoff_date.isoformat(),
+            "days_old": days_old,
+            "files_found": len(files_to_delete),
+            "files_deleted": len(deleted_files),
+            "space_would_free": format_bytes(total_size_to_free),
+            "space_freed": format_bytes(sum(f["size_bytes"] for f in deleted_files)),
+            "files": files_to_delete if dry_run else deleted_files
+        }
+        
+    except Exception as e:
+        print(f"스토리지 정리 오류: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"스토리지 정리 중 오류가 발생했습니다: {str(e)}")
 
 if __name__ == "__main__":
     import uvicorn
