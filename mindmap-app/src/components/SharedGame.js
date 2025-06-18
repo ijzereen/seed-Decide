@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import LZString from 'lz-string';
 import ReignsGame from './ReignsGame';
 import './SharedGame.css';
 
@@ -19,31 +20,56 @@ const SharedGame = () => {
 
     const loadGame = async () => {
       try {
-        // 서버리스 API에서 게임 데이터 가져오기
-        const response = await fetch(`/api/game/${gameId}`);
-        
-        if (!response.ok) {
-          if (response.status === 404) {
-            throw new Error('게임을 찾을 수 없습니다. 링크가 만료되었거나 잘못된 ID입니다.');
-          } else if (response.status === 410) {
-            throw new Error('게임 링크가 만료되었습니다. (24시간 제한)');
-          } else {
-            throw new Error(`서버 오류: ${response.status}`);
-          }
-        }
+        // 개발 환경인지 확인
+        const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
-        const result = await response.json();
-        
-        if (result.success && result.gameData) {
-          // 필수 데이터 검증
-          if (!result.gameData.nodes || !result.gameData.edges || !result.gameData.gameConfig) {
-            throw new Error('잘못된 게임 데이터');
-          }
+        if (isDevelopment) {
+          // 로컬 개발 환경: LZ-String 압축 해제 방식 사용
+          try {
+            const decompressed = LZString.decompressFromEncodedURIComponent(gameId);
+            if (!decompressed) {
+              throw new Error('데이터 압축 해제 실패');
+            }
 
-          setGameData(result.gameData);
-          setLoading(false);
+            const parsedData = JSON.parse(decompressed);
+            
+            // 필수 데이터 검증
+            if (!parsedData.nodes || !parsedData.edges || !parsedData.gameConfig) {
+              throw new Error('잘못된 게임 데이터');
+            }
+
+            setGameData(parsedData);
+            setLoading(false);
+          } catch (decodeError) {
+            throw new Error('게임 데이터를 해독할 수 없습니다. (개발 모드)');
+          }
         } else {
-          throw new Error('게임 데이터 형식이 올바르지 않습니다.');
+          // 프로덕션 환경: 서버리스 API 사용
+          const response = await fetch(`/api/game/${gameId}`);
+          
+          if (!response.ok) {
+            if (response.status === 404) {
+              throw new Error('게임을 찾을 수 없습니다. 링크가 만료되었거나 잘못된 ID입니다.');
+            } else if (response.status === 410) {
+              throw new Error('게임 링크가 만료되었습니다.');
+            } else {
+              throw new Error(`서버 오류: ${response.status}`);
+            }
+          }
+
+          const result = await response.json();
+          
+          if (result.success && result.gameData) {
+            // 필수 데이터 검증
+            if (!result.gameData.nodes || !result.gameData.edges || !result.gameData.gameConfig) {
+              throw new Error('잘못된 게임 데이터');
+            }
+
+            setGameData(result.gameData);
+            setLoading(false);
+          } else {
+            throw new Error('게임 데이터 형식이 올바르지 않습니다.');
+          }
         }
       } catch (err) {
         console.error('게임 데이터 로드 실패:', err);
