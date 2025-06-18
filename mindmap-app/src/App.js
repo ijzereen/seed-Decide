@@ -213,7 +213,7 @@ function MindMapFlow() {
 
   // 모든 노드와 엣지 삭제
   const clearAll = useCallback(() => {
-    if (window.confirm(t('clearAll') + '?')) {
+    if (window.confirm(t('confirmClearAll'))) {
       setNodes([]);
       setEdges([]);
       setNodeId(1);
@@ -412,11 +412,11 @@ function MindMapFlow() {
         setEditingNode(updatedNode);
       }
 
-      alert('스토리가 성공적으로 생성되었습니다!');
+      alert(t('storyGeneratedSuccessfully'));
       
     } catch (error) {
       console.error('스토리 생성 실패:', error);
-      alert('스토리 생성에 실패했습니다. 백엔드 서버가 실행 중인지 확인해주세요.');
+      alert(t('storyGenerationFailed'));
     }
   }, [setNodes, editingNode]);
 

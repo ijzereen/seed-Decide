@@ -39,6 +39,7 @@ const translations = {
     icon: '아이콘',
     name: '이름',
     stat: '스탯',
+    close: '닫기',
     
     // 게임 플레이
     gameOver: '게임 오버!',
@@ -46,7 +47,7 @@ const translations = {
     restart: '다시 시작',
     leftChoice: '왼쪽 선택지',
     rightChoice: '오른쪽 선택지',
-    keyboardHint: '키보드: 왼쪽 선택지 | 오른쪽 선택지',
+    keyboardHint: '키보드: ← 왼쪽 선택지 | → 오른쪽 선택지',
     
     // 스토리 에디터
     storyGeneration: '스토리 생성',
@@ -61,6 +62,7 @@ const translations = {
     noNodesOrConnection: '노드가 없거나 연결되지 않았습니다.',
     doubleClickToAdd: '빈 공간을 더블클릭하여 노드를 추가하세요',
     doubleClickToEdit: '노드를 더블클릭하여 편집하세요',
+    confirmClearAll: '정말로 모든 데이터를 지우시겠습니까?',
     
     // 샘플 스토리
     sampleStory: '샘플 스토리',
@@ -110,7 +112,7 @@ const translations = {
     storyGenerationUnavailable: '스토리 생성 기능이 사용할 수 없습니다.',
     storyGenerationFailed: '스토리 생성에 실패했습니다. 백엔드 서버가 실행 중인지 확인해주세요.',
     imageFilesOnly: '이미지 파일만 업로드 가능합니다.',
-    fileSizeLimit: '파일 크기는 5MB 이하여야 합니다.',
+    fileSizeLimit: '파일 크기는 2MB 이하여야 합니다.',
     imageUploadSuccess: '이미지가 성공적으로 업로드되었습니다.',
     serverConnectionError: '서버에 연결할 수 없습니다. 백엔드 서버가 실행 중인지 확인해주세요.',
     imageUploadError: '이미지 업로드에 실패했습니다',
@@ -120,7 +122,7 @@ const translations = {
     uploading: '업로드 중',
     addImage: '이미지 추가',
     imageHelp: '게임에서 이 노드가 표시될 때 함께 보여질 이미지입니다. (선택사항)',
-    imageFormats: 'JPG, PNG, GIF 형식, 최대 5MB',
+    imageFormats: 'JPG, PNG, GIF 형식, 최대 2MB',
     statChangeRange: '-50 ~ +50 범위로 설정 (0은 변화 없음)',
     usageTips: '사용 팁',
     usageTipItems: {
@@ -134,7 +136,24 @@ const translations = {
     dataSaved: '데이터가 저장되었습니다!',
     dataLoadedSuccessfully: '데이터를 성공적으로 불러왔습니다!',
     invalidFileFormat: '올바르지 않은 파일 형식입니다.',
-    fileReadError: '파일을 읽는 중 오류가 발생했습니다.'
+    fileReadError: '파일을 읽는 중 오류가 발생했습니다.',
+    storyGeneratedSuccessfully: '스토리가 성공적으로 생성되었습니다!',
+    
+    // 추가 공통 UI 텍스트
+    removeImage: '이미지 제거',
+    uploadImageButton: '이미지 업로드',
+    projectInfo: '프로젝트 정보',
+    nodeCount: '노드 개수',
+    viewToggle: '보기 전환',
+    searchPlaceholder: '검색...',
+    noResultsFound: '검색 결과가 없습니다',
+    selectAll: '모두 선택',
+    deselectAll: '선택 해제',
+    
+    // 확인 대화상자
+    confirmDelete: '정말로 삭제하시겠습니까?',
+    confirmRemoveImage: '이미지를 제거하시겠습니까?',
+    unsavedChanges: '저장되지 않은 변경사항이 있습니다. 계속하시겠습니까?'
   },
   
   ja: {
@@ -176,6 +195,7 @@ const translations = {
     icon: 'アイコン',
     name: '名前',
     stat: 'ステータス',
+    close: '閉じる',
     
     // ゲームプレイ
     gameOver: 'ゲームオーバー！',
@@ -183,7 +203,7 @@ const translations = {
     restart: '再開',
     leftChoice: '左の選択肢',
     rightChoice: '右の選択肢',
-    keyboardHint: 'キーボード: 左の選択肢 | 右の選択肢',
+    keyboardHint: 'キーボード: ← 左の選択肢 | → 右の選択肢',
     
     // ストーリーエディター
     storyGeneration: 'ストーリー生成',
@@ -198,6 +218,7 @@ const translations = {
     noNodesOrConnection: 'ノードがないか、接続されていません。',
     doubleClickToAdd: '空いている場所をダブルクリックしてノードを追加してください',
     doubleClickToEdit: 'ノードをダブルクリックして編集してください',
+    confirmClearAll: '本当にすべてのデータを削除しますか？',
     
     // サンプルストーリー
     sampleStory: 'サンプルストーリー',
@@ -247,7 +268,7 @@ const translations = {
     storyGenerationUnavailable: 'ストーリー生成機能が利用できません。',
     storyGenerationFailed: 'ストーリー生成に失敗しました。バックエンドサーバーが実行中か確認してください。',
     imageFilesOnly: '画像ファイルのみアップロード可能です。',
-    fileSizeLimit: 'ファイルサイズは5MB以下である必要があります。',
+    fileSizeLimit: 'ファイルサイズは2MB以下である必要があります。',
     imageUploadSuccess: '画像が正常にアップロードされました。',
     serverConnectionError: 'サーバーに接続できません。バックエンドサーバーが実行中か確認してください。',
     imageUploadError: '画像アップロードに失敗しました',
@@ -257,7 +278,7 @@ const translations = {
     uploading: 'アップロード中',
     addImage: '画像追加',
     imageHelp: 'ゲームでこのノードが表示される際に一緒に表示される画像です。（オプション）',
-    imageFormats: 'JPG、PNG、GIF形式、最大5MB',
+    imageFormats: 'JPG、PNG、GIF形式、最大2MB',
     statChangeRange: '-50 ~ +50の範囲で設定（0は変化なし）',
     usageTips: '使用ヒント',
     usageTipItems: {
@@ -271,7 +292,24 @@ const translations = {
     dataSaved: 'データが保存されました！',
     dataLoadedSuccessfully: 'データの読み込みに成功しました！',
     invalidFileFormat: '正しくないファイル形式です。',
-    fileReadError: 'ファイルの読み込み中にエラーが発生しました。'
+    fileReadError: 'ファイルの読み込み中にエラーが発生しました。',
+    storyGeneratedSuccessfully: 'ストーリーが正常に生成されました！',
+    
+    // 追加の共通UIテキスト
+    removeImage: '画像削除',
+    uploadImageButton: '画像アップロード',
+    projectInfo: 'プロジェクト情報',
+    nodeCount: 'ノード数',
+    viewToggle: '表示切り替え',
+    searchPlaceholder: '検索...',
+    noResultsFound: '検索結果が見つかりません',
+    selectAll: 'すべて選択',
+    deselectAll: '選択解除',
+    
+    // 確認ダイアログ
+    confirmDelete: '本当に削除しますか？',
+    confirmRemoveImage: '画像を削除しますか？',
+    unsavedChanges: '保存されていない変更があります。続行しますか？'
   },
   
   en: {
@@ -313,6 +351,7 @@ const translations = {
     icon: 'Icon',
     name: 'Name',
     stat: 'Stat',
+    close: 'Close',
     
     // Game play
     gameOver: 'Game Over!',
@@ -320,7 +359,7 @@ const translations = {
     restart: 'Restart',
     leftChoice: 'Left Choice',
     rightChoice: 'Right Choice',
-    keyboardHint: 'Keyboard: Left Choice | Right Choice',
+    keyboardHint: 'Keyboard: ← Left Choice | → Right Choice',
     
     // Story editor
     storyGeneration: 'Story Generation',
@@ -352,7 +391,7 @@ const translations = {
     storyGenerationUnavailable: 'Story generation feature is unavailable.',
     storyGenerationFailed: 'Story generation failed. Please check if the backend server is running.',
     imageFilesOnly: 'Only image files can be uploaded.',
-    fileSizeLimit: 'File size must be 5MB or less.',
+    fileSizeLimit: 'File size must be 2MB or less.',
     imageUploadSuccess: 'Image uploaded successfully.',
     serverConnectionError: 'Cannot connect to server. Please check if the backend server is running.',
     imageUploadError: 'Image upload failed',
@@ -362,7 +401,7 @@ const translations = {
     uploading: 'Uploading',
     addImage: 'Add image',
     imageHelp: 'Image that will be shown along with this node in the game. (Optional)',
-    imageFormats: 'JPG, PNG, GIF formats, max 5MB',
+    imageFormats: 'JPG, PNG, GIF formats, max 2MB',
     statChangeRange: 'Set within -50 ~ +50 range (0 means no change)',
     usageTips: 'Usage Tips',
     usageTipItems: {
@@ -377,6 +416,7 @@ const translations = {
     dataLoadedSuccessfully: 'Data loaded successfully!',
     invalidFileFormat: 'Invalid file format.',
     fileReadError: 'An error occurred while reading the file.',
+    storyGeneratedSuccessfully: 'Story generated successfully!',
     
     // Guide messages
     noNodesMessage: 'At least one node is required to start the game.',
@@ -384,6 +424,7 @@ const translations = {
     noNodesOrConnection: 'No nodes or no connections.',
     doubleClickToAdd: 'Double-click on empty space to add a node',
     doubleClickToEdit: 'Double-click on a node to edit it',
+    confirmClearAll: 'Are you sure you want to clear all data?',
     
     // Sample stories
     sampleStory: 'Sample Story',
@@ -406,7 +447,23 @@ const translations = {
     language: 'Language',
     korean: '한국어',
     japanese: '日本語',
-    english: 'English'
+    english: 'English',
+    
+    // Additional common UI text
+    removeImage: 'Remove Image',
+    uploadImageButton: 'Upload Image',
+    projectInfo: 'Project Info',
+    nodeCount: 'Node Count',
+    viewToggle: 'View Toggle',
+    searchPlaceholder: 'Search...',
+    noResultsFound: 'No results found',
+    selectAll: 'Select All',
+    deselectAll: 'Deselect All',
+    
+    // Confirmation dialogs
+    confirmDelete: 'Are you sure you want to delete?',
+    confirmRemoveImage: 'Do you want to remove the image?',
+    unsavedChanges: 'You have unsaved changes. Do you want to continue?'
   }
 };
 

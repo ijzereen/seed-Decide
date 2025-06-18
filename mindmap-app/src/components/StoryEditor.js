@@ -15,6 +15,7 @@ const StoryEditor = ({
   const [isGenerating, setIsGenerating] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [viewMode, setViewMode] = useState('tree'); // 'tree', 'list', 'graph'
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
   const editorRef = useRef(null);
 
   // 선택된 노드 정보
@@ -107,6 +108,63 @@ const StoryEditor = ({
     };
     
     onNodeUpdate(updatedNode);
+  };
+
+  // 이미지 업로드 처리
+  const handleImageUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    console.log('Image upload started:', file.name, file.type, file.size);
+
+    if (!file.type.startsWith('image/')) {
+      alert(t('imageFilesOnly'));
+      return;
+    }
+
+    const maxSize = 2 * 1024 * 1024; // 2MB로 제한 (Base64로 저장하므로)
+    if (file.size > maxSize) {
+      alert(t('fileSizeLimit'));
+      return;
+    }
+
+    setIsUploadingImage(true);
+    
+    try {
+      // FileReader를 사용해 Base64로 변환
+      const reader = new FileReader();
+      
+      reader.onload = (e) => {
+        const base64Data = e.target.result;
+        
+        // 노드 데이터에 Base64 이미지 저장
+        handleNodeUpdate('imageUrl', base64Data);
+        setIsUploadingImage(false);
+        alert(t('imageUploadSuccess'));
+      };
+      
+      reader.onerror = () => {
+        console.error('File reading failed');
+        alert(t('imageUploadError'));
+        setIsUploadingImage(false);
+      };
+      
+      // Base64로 읽기 시작
+      reader.readAsDataURL(file);
+      
+    } catch (error) {
+      console.error('Image upload failed:', error);
+      alert(t('imageUploadError') + `: ${error.message}`);
+      setIsUploadingImage(false);
+    }
+  };
+
+  // 이미지 제거 처리
+  const handleImageRemove = () => {
+    if (!selectedNode?.data?.imageUrl) return;
+    
+    // 로컬 저장이므로 단순히 데이터에서 제거
+    handleNodeUpdate('imageUrl', '');
   };
 
   // 트리 노드 렌더링
@@ -263,6 +321,56 @@ const StoryEditor = ({
                       className="choice-input"
                       placeholder={t('choiceTextPlaceholder') + '...'}
                     />
+                  </div>
+
+                  {/* 이미지 업로드 섹션 */}
+                  <div className="content-section">
+                    <label className="content-label">{t('storyImage')}</label>
+                    
+                    {/* 현재 이미지 표시 */}
+                    {selectedNode.data.imageUrl && (
+                      <div className="current-image">
+                        <img
+                          src={selectedNode.data.imageUrl}
+                          alt={t('storyImage')}
+                          className="story-image-preview"
+                        />
+                        <button
+                          type="button"
+                          onClick={handleImageRemove}
+                          className="remove-image-btn"
+                        >
+                          🗑️ {t('removeImage')}
+                        </button>
+                      </div>
+                    )}
+
+                    {/* 이미지 업로드 버튼 */}
+                    <div className="image-upload-section">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        disabled={isUploadingImage}
+                        id="story-image-upload"
+                        style={{ display: 'none' }}
+                      />
+                      <label
+                        htmlFor="story-image-upload"
+                        className={`image-upload-btn ${isUploadingImage ? 'uploading' : ''}`}
+                      >
+                        {isUploadingImage ? (
+                          <>🔄 {t('uploading')}...</>
+                        ) : selectedNode.data.imageUrl ? (
+                          <>📷 {t('changeImage')}</>
+                        ) : (
+                          <>📷 {t('addImage')}</>
+                        )}
+                      </label>
+                      <div className="image-upload-hint">
+                        {t('maxFileSize')}: 2MB
+                      </div>
+                    </div>
                   </div>
 
                   {/* 스탯 변화 설정 */}
