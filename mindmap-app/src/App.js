@@ -10,7 +10,6 @@ import ReactFlow, {
   useReactFlow,
   ReactFlowProvider,
 } from 'reactflow';
-import LZString from 'lz-string';
 
 import 'reactflow/dist/style.css';
 import './App.css';
@@ -282,8 +281,8 @@ function MindMapFlow() {
     event.target.value = '';
   }, [setNodes, setEdges, t]);
 
-  // 게임 공유 기능
-  const shareGame = useCallback(() => {
+  // 게임 공유 기능 (서버리스 API 사용)
+  const shareGame = useCallback(async () => {
     if (nodes.length === 0) {
       alert(t('noNodesMessage'));
       return;
@@ -295,20 +294,38 @@ function MindMapFlow() {
         edges,
         gameConfig
       };
-      
-      const compressed = LZString.compressToEncodedURIComponent(JSON.stringify(gameData));
-      const shareUrl = `${window.location.origin}/play/${compressed}`;
-      
-      // 클립보드에 복사
-      navigator.clipboard.writeText(shareUrl).then(() => {
-        alert('🎮 게임 공유 링크가 클립보드에 복사되었습니다!\n\n이 링크를 다른 사람에게 보내면 바로 게임을 플레이할 수 있습니다.');
-      }).catch(() => {
-        // 클립보드 복사 실패 시 프롬프트로 표시
-        prompt('게임 공유 링크를 복사하세요:', shareUrl);
+
+      // 서버리스 API로 게임 데이터 저장
+      const response = await fetch('/api/save-game', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(gameData)
       });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      
+      if (result.success) {
+        const shareUrl = `${window.location.origin}/play/${result.gameId}`;
+        
+        // 클립보드에 복사
+        navigator.clipboard.writeText(shareUrl).then(() => {
+          alert(`🎮 게임 공유 링크가 클립보드에 복사되었습니다!\n\n${shareUrl}\n\n이 링크를 다른 사람에게 보내면 바로 게임을 플레이할 수 있습니다.\n⏰ 링크는 24시간 동안 유효합니다.`);
+        }).catch(() => {
+          // 클립보드 복사 실패 시 프롬프트로 표시
+          prompt('게임 공유 링크를 복사하세요:', shareUrl);
+        });
+      } else {
+        throw new Error('게임 저장 실패');
+      }
     } catch (error) {
       console.error('게임 공유 실패:', error);
-      alert('게임 공유에 실패했습니다.');
+      alert('게임 공유에 실패했습니다. 다시 시도해주세요.');
     }
   }, [nodes, edges, gameConfig, t]);
 

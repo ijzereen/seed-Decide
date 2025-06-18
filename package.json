@@ -1,0 +1,12 @@
+{
+  "name": "decidex-api",
+  "version": "1.0.0",
+  "description": "DecideX API for game sharing",
+  "type": "module",
+  "dependencies": {
+    "nanoid": "^5.0.0"
+  },
+  "scripts": {
+    "build": "cd mindmap-app && npm run build"
+  }
+} 

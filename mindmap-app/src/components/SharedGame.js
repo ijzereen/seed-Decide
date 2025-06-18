@@ -1,45 +1,59 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import LZString from 'lz-string';
 import ReignsGame from './ReignsGame';
 import './SharedGame.css';
 
 const SharedGame = () => {
-  const { data } = useParams();
+  const { data: gameId } = useParams();
   const navigate = useNavigate();
   const [gameData, setGameData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!data) {
-      setError('게임 데이터가 없습니다.');
+    if (!gameId) {
+      setError('게임 ID가 없습니다.');
       setLoading(false);
       return;
     }
 
-    try {
-      // URL에서 압축된 데이터 해제
-      const decompressed = LZString.decompressFromEncodedURIComponent(data);
-      if (!decompressed) {
-        throw new Error('데이터 압축 해제 실패');
-      }
+    const loadGame = async () => {
+      try {
+        // 서버리스 API에서 게임 데이터 가져오기
+        const response = await fetch(`/api/game/${gameId}`);
+        
+        if (!response.ok) {
+          if (response.status === 404) {
+            throw new Error('게임을 찾을 수 없습니다. 링크가 만료되었거나 잘못된 ID입니다.');
+          } else if (response.status === 410) {
+            throw new Error('게임 링크가 만료되었습니다. (24시간 제한)');
+          } else {
+            throw new Error(`서버 오류: ${response.status}`);
+          }
+        }
 
-      const parsedData = JSON.parse(decompressed);
-      
-      // 필수 데이터 검증
-      if (!parsedData.nodes || !parsedData.edges || !parsedData.gameConfig) {
-        throw new Error('잘못된 게임 데이터');
-      }
+        const result = await response.json();
+        
+        if (result.success && result.gameData) {
+          // 필수 데이터 검증
+          if (!result.gameData.nodes || !result.gameData.edges || !result.gameData.gameConfig) {
+            throw new Error('잘못된 게임 데이터');
+          }
 
-      setGameData(parsedData);
-      setLoading(false);
-    } catch (err) {
-      console.error('게임 데이터 로드 실패:', err);
-      setError('게임 데이터를 불러올 수 없습니다.');
-      setLoading(false);
-    }
-  }, [data]);
+          setGameData(result.gameData);
+          setLoading(false);
+        } else {
+          throw new Error('게임 데이터 형식이 올바르지 않습니다.');
+        }
+      } catch (err) {
+        console.error('게임 데이터 로드 실패:', err);
+        setError(err.message || '게임 데이터를 불러올 수 없습니다.');
+        setLoading(false);
+      }
+    };
+
+    loadGame();
+  }, [gameId]);
 
   const handleBackToHome = () => {
     navigate('/');
