@@ -309,16 +309,18 @@ const ReignsGame = ({ nodes, edges, onBackToEditor, gameConfig }) => {
           <div className="card-content">
             <h3>{currentNode.data.label}</h3>
             
-            {/* 이미지가 있으면 표시 */}
-            {(() => {
-              console.log('Image render check:', {
-                nodeId: currentNode.id,
-                hasImageUrl: !!currentNode.data.imageUrl,
-                imageUrlType: typeof currentNode.data.imageUrl,
-                imageUrlStart: currentNode.data.imageUrl?.substring(0, 30)
-              });
-              return currentNode.data.imageUrl;
-            })() && (
+            <div className="story-text">
+              {(currentNode.data.story || `${currentNode.data.label}${t('story')}?`)
+                .split('\n')
+                .map((line, index) => (
+                  <p key={index} className="story-line">
+                    {line || '\u00A0'}
+                  </p>
+                ))}
+            </div>
+            
+            {/* 이미지가 있으면 표시 - 텍스트 아래로 이동 */}
+            {currentNode.data.imageUrl && (
               <div className="story-image-container">
                 <img
                   src={currentNode.data.imageUrl} // Base64 데이터 직접 사용
@@ -334,16 +336,6 @@ const ReignsGame = ({ nodes, edges, onBackToEditor, gameConfig }) => {
                 />
               </div>
             )}
-            
-            <div className="story-text">
-              {(currentNode.data.story || `${currentNode.data.label}${t('story')}?`)
-                .split('\n')
-                .map((line, index) => (
-                  <p key={index} className="story-line">
-                    {line || '\u00A0'}
-                  </p>
-                ))}
-            </div>
           </div>
         </div>
         
