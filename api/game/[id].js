@@ -1,10 +1,7 @@
-// Vercel Serverless Function - 게임 데이터 불러오기
+// Vercel Serverless Function - 게임 데이터 불러오기 (URL 디코딩 방식)
 // 파일명: api/game/[id].js (동적 라우팅)
 
-// 메모리 저장소 (실제로는 데이터베이스 연결 필요)
-const gameStorage = new Map();
-
-export default async function handler(req, res) {
+module.exports = async (req, res) => {
   // CORS 헤더 설정
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
@@ -27,35 +24,40 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Game ID is required' });
     }
 
-    // 게임 데이터 조회
-    const gameRecord = gameStorage.get(id);
+    try {
+      // Base64 디코딩
+      const base64Data = id
+        .replace(/-/g, '+')
+        .replace(/_/g, '/');
+      
+      // 패딩 추가
+      const paddedData = base64Data + '='.repeat((4 - base64Data.length % 4) % 4);
+      
+      const decodedString = Buffer.from(paddedData, 'base64').toString('utf-8');
+      const gameData = JSON.parse(decodedString);
 
-    if (!gameRecord) {
-      return res.status(404).json({ 
-        error: 'Game not found',
-        message: '게임을 찾을 수 없습니다. 링크가 만료되었거나 잘못된 ID입니다.'
+      // 기본 검증
+      if (!gameData || !gameData.nodes || !gameData.edges || !gameData.gameConfig) {
+        throw new Error('Invalid game data structure');
+      }
+
+      // 게임 데이터 반환
+      res.status(200).json({
+        success: true,
+        gameData: gameData,
+        loadedAt: new Date().toISOString()
+      });
+
+    } catch (decodeError) {
+      console.error('Decode error:', decodeError);
+      return res.status(400).json({ 
+        error: 'Invalid game data',
+        message: '게임 데이터를 해독할 수 없습니다. 링크가 손상되었을 수 있습니다.'
       });
     }
-
-    // 만료 확인
-    if (new Date() > new Date(gameRecord.expiresAt)) {
-      gameStorage.delete(id);
-      return res.status(410).json({ 
-        error: 'Game expired',
-        message: '게임 링크가 만료되었습니다. (24시간 제한)'
-      });
-    }
-
-    // 게임 데이터 반환
-    res.status(200).json({
-      success: true,
-      gameData: gameRecord.data,
-      createdAt: gameRecord.createdAt,
-      expiresAt: gameRecord.expiresAt
-    });
 
   } catch (error) {
     console.error('Game load error:', error);
     res.status(500).json({ error: 'Failed to load game' });
   }
-} 
+}; 

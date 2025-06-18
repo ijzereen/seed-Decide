@@ -315,7 +315,7 @@ function MindMapFlow() {
         
         // 클립보드에 복사
         navigator.clipboard.writeText(shareUrl).then(() => {
-          alert(`🎮 게임 공유 링크가 클립보드에 복사되었습니다!\n\n${shareUrl}\n\n이 링크를 다른 사람에게 보내면 바로 게임을 플레이할 수 있습니다.\n⏰ 링크는 24시간 동안 유효합니다.`);
+          alert(`🎮 게임 공유 링크가 클립보드에 복사되었습니다!\n\n${shareUrl}\n\n이 링크를 다른 사람에게 보내면 바로 게임을 플레이할 수 있습니다.\n📊 데이터 크기: ${result.dataSize}자`);
         }).catch(() => {
           // 클립보드 복사 실패 시 프롬프트로 표시
           prompt('게임 공유 링크를 복사하세요:', shareUrl);
