@@ -43,7 +43,16 @@ const ReignsGame = ({ nodes, edges, onBackToEditor, gameConfig }) => {
 
   // 현재 노드 정보 가져오기
   const getCurrentNode = useCallback(() => {
-    return nodes.find(node => node.id === currentNodeId);
+    const node = nodes.find(node => node.id === currentNodeId);
+    if (node) {
+      console.log('Current node data:', {
+        id: node.id,
+        label: node.data.label,
+        hasImage: !!node.data.imageUrl,
+        imageUrlLength: node.data.imageUrl?.length
+      });
+    }
+    return node;
   }, [nodes, currentNodeId]);
 
   // 현재 노드의 선택지(자식 노드들) 가져오기
@@ -301,13 +310,25 @@ const ReignsGame = ({ nodes, edges, onBackToEditor, gameConfig }) => {
             <h3>{currentNode.data.label}</h3>
             
             {/* 이미지가 있으면 표시 */}
-            {currentNode.data.imageUrl && (
+            {(() => {
+              console.log('Image render check:', {
+                nodeId: currentNode.id,
+                hasImageUrl: !!currentNode.data.imageUrl,
+                imageUrlType: typeof currentNode.data.imageUrl,
+                imageUrlStart: currentNode.data.imageUrl?.substring(0, 30)
+              });
+              return currentNode.data.imageUrl;
+            })() && (
               <div className="story-image-container">
                 <img
                   src={currentNode.data.imageUrl} // Base64 데이터 직접 사용
                   alt="스토리 이미지"
                   className="story-image"
+                  onLoad={() => {
+                    console.log('Image loaded successfully for node:', currentNode.id);
+                  }}
                   onError={(e) => {
+                    console.error('Image load failed for node:', currentNode.id, 'imageUrl:', currentNode.data.imageUrl?.substring(0, 50) + '...');
                     e.target.style.display = 'none';
                   }}
                 />
