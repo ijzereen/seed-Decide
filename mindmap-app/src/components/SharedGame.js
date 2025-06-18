@@ -16,23 +16,17 @@ const SharedGame = () => {
     const fetchGame = async () => {
       try {
         console.log('게임 조회 시작:', gameId);
-        const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000';
-        const response = await fetch(`${backendUrl}/api/games/${gameId}`);
-        
-        if (!response.ok) {
-          if (response.status === 404) {
-            throw new Error('게임을 찾을 수 없습니다.');
-          } else {
-            throw new Error('게임을 불러오는 중 오류가 발생했습니다.');
-          }
-        }
-
-        const data = await response.json();
+        const { getGame } = await import('../utils/api');
+        const data = await getGame(gameId);
         console.log('게임 데이터 조회 성공:', data);
         setGameData(data);
       } catch (err) {
         console.error('게임 조회 오류:', err);
-        setError(err.message);
+        if (err.message.includes('404')) {
+          setError('게임을 찾을 수 없습니다.');
+        } else {
+          setError('게임을 불러오는 중 오류가 발생했습니다.');
+        }
       } finally {
         setLoading(false);
       }

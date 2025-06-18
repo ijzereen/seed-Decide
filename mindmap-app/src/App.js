@@ -307,20 +307,8 @@ function MindMapFlow() {
         gameConfig: gameConfig
       };
 
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000';
-      const response = await fetch(`${backendUrl}/api/games`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(gameData)
-      });
-
-      if (!response.ok) {
-        throw new Error('게임 저장에 실패했습니다.');
-      }
-
-      const result = await response.json();
+      const { saveGame } = await import('../utils/api');
+      const result = await saveGame(gameData);
       const fullShareUrl = `${window.location.origin}/game/${result.gameId}`;
       setShareUrl(fullShareUrl);
       setShowShareModal(true);
@@ -421,49 +409,39 @@ function MindMapFlow() {
   // 스토리 생성 함수
   const handleGenerateStory = useCallback(async (context) => {
     try {
-      const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8000';
-      const response = await fetch(`${apiUrl}/api/generate-story`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const storyRequest = {
+        currentNode: {
+          id: context.currentNode.id,
+          label: context.currentNode.data.label,
+          story: context.currentNode.data.story,
+          choice: context.currentNode.data.choice,
+          statChanges: context.currentNode.data.statChanges
         },
-        body: JSON.stringify({
-          currentNode: {
-            id: context.currentNode.id,
-            label: context.currentNode.data.label,
-            story: context.currentNode.data.story,
-            choice: context.currentNode.data.choice,
-            statChanges: context.currentNode.data.statChanges
-          },
-          parentNodes: context.parentNodes.map(node => ({
-            id: node.id,
-            label: node.data.label,
-            story: node.data.story,
-            choice: node.data.choice
-          })),
-          childNodes: context.childNodes.map(node => ({
-            id: node.id,
-            label: node.data.label,
-            story: node.data.story,
-            choice: node.data.choice
-          })),
-          gameConfig: context.gameConfig,
-          allNodes: context.allNodes.map(node => ({
-            id: node.id,
-            label: node.data.label,
-            story: node.data.story,
-            choice: node.data.choice
-          })),
-          allEdges: context.allEdges,
-          provider: 'claude' // 기본값으로 Claude 사용
-        })
-      });
+        parentNodes: context.parentNodes.map(node => ({
+          id: node.id,
+          label: node.data.label,
+          story: node.data.story,
+          choice: node.data.choice
+        })),
+        childNodes: context.childNodes.map(node => ({
+          id: node.id,
+          label: node.data.label,
+          story: node.data.story,
+          choice: node.data.choice
+        })),
+        gameConfig: context.gameConfig,
+        allNodes: context.allNodes.map(node => ({
+          id: node.id,
+          label: node.data.label,
+          story: node.data.story,
+          choice: node.data.choice
+        })),
+        allEdges: context.allEdges,
+        provider: 'claude' // 기본값으로 Claude 사용
+      };
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const result = await response.json();
+      const { generateStory } = await import('../utils/api');
+      const result = await generateStory(storyRequest);
       
       // 생성된 스토리로 노드 업데이트
       const updatedNode = {

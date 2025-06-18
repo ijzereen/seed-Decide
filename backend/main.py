@@ -32,6 +32,7 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:3000", 
         "http://localhost:3003",  # React 개발 서버
+        "https://decide-x.vercel.app",  # 실제 Vercel 도메인
         "https://*.vercel.app",   # Vercel 배포 도메인
         "https://*.amplifyapp.com",  # Amplify 기본 도메인
         "https://*.amazonaws.com",   # AWS 서비스 도메인
